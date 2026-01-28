@@ -14,8 +14,8 @@ on:
           - StandaloneOSX
   push:
     branches: ["main"]
-  pull_request:
-    types: [opened, synchronize]
+#  pull_request:
+#    types: [opened, synchronize]
 
 permissions:
   checks: write
