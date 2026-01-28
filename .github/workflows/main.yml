@@ -28,9 +28,12 @@ jobs:
           lfs: true
 
       - name: Build
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          RUNNER_SUDO_PASSWORD: ${{ secrets.RUNNER_SUDO_PASSWORD }}
         run: |
-          # 1. Create license file from secret
-          echo "${{ secrets.UNITY_LICENSE }}" > ./Unity_v6000.x.ulf
+          # 1. Create license file from secret (safely via env var)
+          echo "$UNITY_LICENSE" > ./Unity_v6000.x.ulf
 
           # 2. Run Unity Build in Docker
           # Using the image that successfully pulled earlier
@@ -40,7 +43,7 @@ jobs:
           mkdir -p build/WebGL
           chmod -R 777 build
 
-          echo '${{ secrets.RUNNER_SUDO_PASSWORD }}' | sudo -S docker run --rm \
+          echo "$RUNNER_SUDO_PASSWORD" | sudo -S docker run --rm \
             -v "$(pwd):/project" \
             -v "$(pwd)/Unity_v6000.x.ulf:/project/Unity_v6000.x.ulf" \
             -w /project \
@@ -57,7 +60,9 @@ jobs:
 
       - name: Fix Permissions
         if: always()
-        run: echo '${{ secrets.RUNNER_SUDO_PASSWORD }}' | sudo -S chown -R $USER:$USER build
+        env:
+          RUNNER_SUDO_PASSWORD: ${{ secrets.RUNNER_SUDO_PASSWORD }}
+        run: echo "$RUNNER_SUDO_PASSWORD" | sudo -S chown -R $USER:$USER build
 
       - uses: actions/upload-artifact@v4
         with:
