@@ -33,6 +33,7 @@ jobs:
           RUNNER_SUDO_PASSWORD: ${{ secrets.RUNNER_SUDO_PASSWORD }}
         run: |
           # 1. Create license file from secret (safely via env var)
+          rm -rf ./Unity_v6000.x.ulf
           echo "$UNITY_LICENSE" > ./Unity_v6000.x.ulf
 
           # 2. Run Unity Build in Docker

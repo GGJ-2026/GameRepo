@@ -11,6 +11,11 @@ mkdir -p Library
 chmod -R 777 build Library
 
 # 2. Check License
+if [ -d ./Unity_v6000.x.ulf ]; then
+    echo "WARNING: ./Unity_v6000.x.ulf is a directory (Docker artifact). Removing it..."
+    rm -rf ./Unity_v6000.x.ulf
+fi
+
 if [ ! -f ./Unity_v6000.x.ulf ]; then
     echo "ERROR: ./Unity_v6000.x.ulf not found in current directory."
     echo "Please paste your license content into this file before running."
