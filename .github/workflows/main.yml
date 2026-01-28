@@ -1,72 +1,88 @@
 name: Build Project (Avalin-Style)
 
 on:
-    workflow_dispatch:
-        inputs:
-            targetPlatform:
-                description: "Build Target"
-                required: true
-                default: "WebGL"
-                type: choice
-                options:
-                    - WebGL
-                    - StandaloneWindows64
-                    - StandaloneOSX
-    pull_request:
-        types: [opened, synchronize]
+  workflow_dispatch:
+    inputs:
+      targetPlatform:
+        description: "Build Target"
+        required: true
+        default: "WebGL"
+        type: choice
+        options:
+          - WebGL
+          - StandaloneWindows64
+          - StandaloneOSX
+  pull_request:
+    types: [opened, synchronize]
 
 permissions:
-    checks: write
-    contents: read
-    pull-requests: write
+  checks: write
+  contents: write
+  pull-requests: write
 
 jobs:
-    build:
-        name: Build ${{ inputs.targetPlatform || 'WebGL' }}
-        runs-on: [self-hosted]
+  build:
+    name: Build ${{ inputs.targetPlatform || 'WebGL' }}
+    runs-on: [self-hosted]
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - ${{ inputs.targetPlatform || 'WebGL' }}
 
-        # Avalin Logic: Define matrix or single target
-        strategy:
-            fail-fast: false
-            matrix:
-                # If triggered via PR, build WebGL. If manual, build input.
-                targetPlatform:
-                    - ${{ inputs.targetPlatform || 'WebGL' }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
 
-        steps:
-            - name: Checkout Repository
-              uses: actions/checkout@v4
-              with:
-                  lfs: true
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ matrix.targetPlatform }}-
+            Library-
 
-            - name: Cache
-              uses: actions/cache@v3
-              with:
-                  path: Library
-                  key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-                  restore-keys: |
-                      Library-${{ matrix.targetPlatform }}-
-                      Library-
+      - name: Build project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+          allowDirtyBuild: true
 
-            # Avalin Logic: Use direct secret envs and game-ci
-            - name: Build project
-              uses: game-ci/unity-builder@v4
-              env:
-                  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-                  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-                  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-              with:
-                  targetPlatform: ${{ matrix.targetPlatform }}
-                  allowDirtyBuild: true
+      - name: Fix Permissions
+        if: always()
+        env:
+          RUNNER_SUDO_PASSWORD: ${{ secrets.RUNNER_SUDO_PASSWORD }}
+        run: echo "$RUNNER_SUDO_PASSWORD" | sudo -S chown -R $USER:$USER build Library
 
-            # Avalin Logic: Linux permissions fix
-            - name: Fix Permissions
-              if: always()
-              env:
-                  RUNNER_SUDO_PASSWORD: ${{ secrets.RUNNER_SUDO_PASSWORD }}
-              run: echo "$RUNNER_SUDO_PASSWORD" | sudo -S chown -R $USER:$USER build Library
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Build-${{ matrix.targetPlatform }}
+          path: build/${{ matrix.targetPlatform }}
 
-            - uses: actions/upload-artifact@v4
-              with:
-                  name: Build-${{ matrix.targetPlatform }}
-                  path: build/${{ matrix.targetPlatform }}
+  deploy:
+    needs: build
+    name: Deploy to GitHub Pages
+    if: github.ref == 'refs/heads/main' && (inputs.targetPlatform == 'WebGL' || inputs.targetPlatform == '' || github.event_name == 'pull_request')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: Build-WebGL
+          path: build
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
