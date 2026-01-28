@@ -1,16 +1,11 @@
 #!/bin/bash
-# Debug script for manual execution on the runner
-
 IMAGE="unityci/editor:ubuntu-6000.3.5f1-webgl-3"
 echo "Starting Debug Build..."
 echo "Image: $IMAGE"
 
-# 1. Ensure directories exist
 mkdir -p build/WebGL
 mkdir -p Library
 chmod -R 777 build Library
-
-# 2. Check License
 if [ -d ./Unity_v6000.x.ulf ]; then
     echo "WARNING: ./Unity_v6000.x.ulf is a directory (Docker artifact). Removing it..."
     rm -rf ./Unity_v6000.x.ulf
@@ -22,16 +17,11 @@ if [ ! -f ./Unity_v6000.x.ulf ]; then
     exit 1
 fi
 
-# 3. Run Docker
-# We removed '-quit' to see if it stays alive. 
-# You might need to Ctrl+C if it succeeds and hangs.
 echo "Running Docker command..."
 
-# Sanity Check
 echo "Checking Unity Version..."
 sudo docker run --rm --privileged $IMAGE unity-editor -version
 
-# Build Command
 echo "Starting Build..."
 sudo docker run --rm --privileged \
   -v "$(pwd):/project" \
