@@ -19,8 +19,8 @@ jobs:
       matrix:
         targetPlatform:
           - WebGL
-          - StandaloneWindows64
-          - StandaloneOSX
+    #          - StandaloneWindows64
+    #          - StandaloneOSX
     steps:
       # Checkout
       - name: Checkout repository
