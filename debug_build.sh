@@ -27,7 +27,7 @@ fi
 # You might need to Ctrl+C if it succeeds and hangs.
 echo "Running Docker command..."
 
-sudo docker run --rm \
+sudo docker run --rm --privileged \
   -v "$(pwd):/project" \
   -v "$(pwd)/Unity_v6000.x.ulf:/project/Unity_v6000.x.ulf" \
   -w /project \
@@ -37,9 +37,9 @@ sudo docker run --rm \
   -batchmode \
   -nographics \
   -noaudio \
+  -quit \
   -manualLicenseFile /project/Unity_v6000.x.ulf \
   -projectPath . \
-  -executeMethod Builder.BuildWebGL \
   -logFile /dev/stdout
 
 echo "Docker command finished."

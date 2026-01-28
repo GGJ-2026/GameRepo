@@ -49,7 +49,7 @@ jobs:
           echo "Memory before build:"
           free -h
 
-          echo "$RUNNER_SUDO_PASSWORD" | sudo -S docker run --rm \
+          echo "$RUNNER_SUDO_PASSWORD" | sudo -S docker run --rm --privileged \
             -v "$(pwd):/project" \
             -v "$(pwd)/Unity_v6000.x.ulf:/project/Unity_v6000.x.ulf" \
             -w /project \
