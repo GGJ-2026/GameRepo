@@ -40,7 +40,7 @@ jobs:
           mkdir -p build/WebGL
           chmod -R 777 build
 
-          sudo docker run --rm \
+          echo '${{ secrets.RUNNER_SUDO_PASSWORD }}' | sudo -S docker run --rm \
             -v "$(pwd):/project" \
             -v "$(pwd)/Unity_v6000.x.ulf:/project/Unity_v6000.x.ulf" \
             -w /project \
@@ -57,7 +57,7 @@ jobs:
 
       - name: Fix Permissions
         if: always()
-        run: sudo chown -R $USER:$USER build
+        run: echo '${{ secrets.RUNNER_SUDO_PASSWORD }}' | sudo -S chown -R $USER:$USER build
 
       - uses: actions/upload-artifact@v4
         with:
