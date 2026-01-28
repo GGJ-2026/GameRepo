@@ -1,82 +1,72 @@
-name: Build Project
+name: Build Project (Avalin-Style)
 
 on:
-  workflow_dispatch: {}
-  pull_request:
-    types: [opened, synchronize]
+    workflow_dispatch:
+        inputs:
+            targetPlatform:
+                description: "Build Target"
+                required: true
+                default: "WebGL"
+                type: choice
+                options:
+                    - WebGL
+                    - StandaloneWindows64
+                    - StandaloneOSX
+    pull_request:
+        types: [opened, synchronize]
 
 permissions:
-  checks: write
-  contents: read
-  pull-requests: write
+    checks: write
+    contents: read
+    pull-requests: write
 
 jobs:
-  build:
-    name: Build ${{ matrix.targetPlatform }}
-    runs-on: [self-hosted]
-    strategy:
-      fail-fast: false
-      matrix:
-        targetPlatform:
-          - WebGL
-          # - StandaloneWindows64
-          # - StandaloneOSX
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          lfs: true
+    build:
+        name: Build ${{ inputs.targetPlatform || 'WebGL' }}
+        runs-on: [self-hosted]
 
-      - name: Build
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          RUNNER_SUDO_PASSWORD: ${{ secrets.RUNNER_SUDO_PASSWORD }}
-        run: |
-          # 1. Create license file from secret (safely via env var)
-          rm -rf ./Unity_v6000.x.ulf
-          echo "$UNITY_LICENSE" > ./Unity_v6000.x.ulf
+        # Avalin Logic: Define matrix or single target
+        strategy:
+            fail-fast: false
+            matrix:
+                # If triggered via PR, build WebGL. If manual, build input.
+                targetPlatform:
+                    - ${{ inputs.targetPlatform || 'WebGL' }}
 
-          # 2. Run Unity Build in Docker
-          # Using the image that successfully pulled earlier
-          IMAGE="unityci/editor:ubuntu-6000.3.5f1-webgl-3"
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+              with:
+                  lfs: true
 
-          # Ensure build directory exists and has permissions
-          mkdir -p build/WebGL
-          mkdir -p Library
-          chmod -R 777 build
-          chmod -R 777 Library
+            - name: Cache
+              uses: actions/cache@v3
+              with:
+                  path: Library
+                  key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+                  restore-keys: |
+                      Library-${{ matrix.targetPlatform }}-
+                      Library-
 
-          echo "Memory before build:"
-          free -h
+            # Avalin Logic: Use direct secret envs and game-ci
+            - name: Build project
+              uses: game-ci/unity-builder@v4
+              env:
+                  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+                  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+                  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+              with:
+                  targetPlatform: ${{ matrix.targetPlatform }}
+                  allowDirtyBuild: true
 
-          echo "$RUNNER_SUDO_PASSWORD" | sudo -S docker run --rm --privileged \
-            -v "$(pwd):/project" \
-            -v "$(pwd)/Unity_v6000.x.ulf:/project/Unity_v6000.x.ulf" \
-            -w /project \
-            -e UNITY_LICENSE_FILE=/project/Unity_v6000.x.ulf \
-            $IMAGE \
-            unity-editor \
-            -verbose \
-            -batchmode \
-            -nographics \
-            -noaudio \
-            -quit \
-            -manualLicenseFile /project/Unity_v6000.x.ulf \
-            -projectPath . \
-            -executeMethod Builder.BuildWebGL \
-            -logFile build.log
+            # Avalin Logic: Linux permissions fix
+            - name: Fix Permissions
+              if: always()
+              env:
+                  RUNNER_SUDO_PASSWORD: ${{ secrets.RUNNER_SUDO_PASSWORD }}
+              run: echo "$RUNNER_SUDO_PASSWORD" | sudo -S chown -R $USER:$USER build Library
 
-          echo "Buid finished. Exit code: $?"
-          echo "Dumping logs:"
-          cat build.log || echo "Log file not found"
-
-      - name: Fix Permissions
-        if: always()
-        env:
-          RUNNER_SUDO_PASSWORD: ${{ secrets.RUNNER_SUDO_PASSWORD }}
-        run: echo "$RUNNER_SUDO_PASSWORD" | sudo -S chown -R $USER:$USER build
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Build-${{ matrix.targetPlatform }}
-          path: build/${{ matrix.targetPlatform }}
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: Build-${{ matrix.targetPlatform }}
+                  path: build/${{ matrix.targetPlatform }}
