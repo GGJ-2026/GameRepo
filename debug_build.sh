@@ -27,6 +27,12 @@ fi
 # You might need to Ctrl+C if it succeeds and hangs.
 echo "Running Docker command..."
 
+# Sanity Check
+echo "Checking Unity Version..."
+sudo docker run --rm --privileged $IMAGE unity-editor -version
+
+# Build Command
+echo "Starting Build..."
 sudo docker run --rm --privileged \
   -v "$(pwd):/project" \
   -v "$(pwd)/Unity_v6000.x.ulf:/project/Unity_v6000.x.ulf" \
@@ -40,6 +46,8 @@ sudo docker run --rm --privileged \
   -quit \
   -manualLicenseFile /project/Unity_v6000.x.ulf \
   -projectPath . \
+  -executeMethod Builder.BuildWebGL \
   -logFile /dev/stdout
 
 echo "Docker command finished."
+ls -R build || echo "Build directory empty/missing"
