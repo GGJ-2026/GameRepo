@@ -51,7 +51,7 @@ jobs:
             -w /project \
             -e UNITY_LICENSE_FILE=/project/Unity_v6000.x.ulf \
             $IMAGE \
-            unity-editor \
+            -verbose \
             -batchmode \
             -nographics \
             -noaudio \
