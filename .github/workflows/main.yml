@@ -41,7 +41,9 @@ jobs:
 
           # Ensure build directory exists and has permissions
           mkdir -p build/WebGL
+          mkdir -p Library
           chmod -R 777 build
+          chmod -R 777 Library
 
           echo "$RUNNER_SUDO_PASSWORD" | sudo -S docker run --rm \
             -v "$(pwd):/project" \
@@ -52,6 +54,7 @@ jobs:
             unity-editor \
             -batchmode \
             -nographics \
+            -noaudio \
             -quit \
             -manualLicenseFile /project/Unity_v6000.x.ulf \
             -projectPath . \
