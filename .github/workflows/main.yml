@@ -56,7 +56,10 @@ jobs:
             -manualLicenseFile /project/Unity_v6000.x.ulf \
             -projectPath . \
             -executeMethod Builder.BuildWebGL \
-            -logFile /dev/stdout
+            -logFile build.log
+
+          echo "Buid finished (or failed). Dumping logs:"
+          cat build.log || echo "Log file not found"
 
       - name: Fix Permissions
         if: always()
