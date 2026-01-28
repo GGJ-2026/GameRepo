@@ -12,8 +12,10 @@ on:
           - WebGL
           - StandaloneWindows64
           - StandaloneOSX
-  pull_request:
-    types: [opened, synchronize]
+  push:
+    branches: ["main"]
+#  pull_request:
+#    types: [opened, synchronize]
 
 permissions:
   checks: write
