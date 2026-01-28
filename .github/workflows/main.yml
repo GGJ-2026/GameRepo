@@ -13,7 +13,7 @@ permissions:
 jobs:
   build:
     name: Build ${{ matrix.targetPlatform }}
-    runs-on: [self-hosted, linux]
+    runs-on: [self-hosted, Linux]
     strategy:
       fail-fast: false
       matrix:
