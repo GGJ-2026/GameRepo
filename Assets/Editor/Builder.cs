@@ -10,11 +10,6 @@ public static class Builder
         BuildProject(BuildTarget.WebGL, "build/WebGL");
     }
 
-    public static void BuildWindows()
-    {
-        BuildProject(BuildTarget.StandaloneWindows64, "build/Windows/Game.exe");
-    }
-
     public static void BuildMac()
     {
         BuildProject(BuildTarget.StandaloneOSX, "build/Mac/Game.app");
