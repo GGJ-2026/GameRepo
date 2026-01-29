@@ -57,6 +57,7 @@ jobs:
           targetPlatform: ${{ matrix.targetPlatform }}
           allowDirtyBuild: true
           runAsHostUser: true
+          buildMethod: Builder.BuildFromCI
           chownFilesTo: "1000:1000"
 
       - name: Fix Permissions
