@@ -83,6 +83,15 @@ jobs:
           name: Build-WebGL
           path: build
 
+      - name: Flatten Directory
+        run: |
+          if [ -d "build/WebGL" ]; then
+            echo "Detected WebGL subdirectory. Flattening..."
+            mv build/WebGL/* build/
+            rm -rf build/WebGL
+          fi
+          ls -R build
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
