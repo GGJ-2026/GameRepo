@@ -15,6 +15,29 @@ public static class Builder
         BuildProject(BuildTarget.StandaloneOSX, "build/Mac/Game.app");
     }
 
+    public static void BuildFromCI()
+    {
+        var buildTarget = EditorUserBuildSettings.activeBuildTarget;
+        switch (buildTarget)
+        {
+            case BuildTarget.WebGL:
+                BuildWebGL();
+                break;
+            case BuildTarget.StandaloneOSX:
+                BuildMac();
+                break;
+            case BuildTarget.StandaloneWindows64:
+                BuildProject(BuildTarget.StandaloneWindows64, "build/Windows/Game.exe");
+                break;
+            default:
+                Debug.LogError($"Unsupported build target/CI setup: {buildTarget}");
+                // Instead of failing, try to perform a direct build based on target
+                // This handles cases where target might be StandaloneLinux64, etc.
+                BuildProject(buildTarget, $"build/{buildTarget}");
+                break;
+        }
+    }
+
     private static void BuildProject(BuildTarget buildTarget, string buildPath)
     {
         var buildPlayerOptions = new BuildPlayerOptions
