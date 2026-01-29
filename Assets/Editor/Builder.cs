@@ -6,6 +6,7 @@ public static class Builder
 {
     public static void BuildWebGL()
     {
+        PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
         BuildProject(BuildTarget.WebGL, "build/WebGL");
     }
 
