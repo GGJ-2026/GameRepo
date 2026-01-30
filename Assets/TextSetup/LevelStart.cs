@@ -4,7 +4,7 @@ public class LevelStartTrigger : MonoBehaviour
 {
     void Start()
     {
-        MessageManager.Instance.Display("Anne is een lief");
-        MessageManager.Instance.Display("Hou van!");
+        MessageManager.Instance.Display("Objective: Find Patient Zero");
+        MessageManager.Instance.Display("Good Luck.");
     }
 }
