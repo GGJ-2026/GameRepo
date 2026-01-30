@@ -38,6 +38,10 @@ jobs:
         with:
           lfs: true
 
+      - name: Check Disk Space
+        run: df -h
+
+
       - name: Cache
         uses: actions/cache@v3
         with:
@@ -65,6 +69,14 @@ jobs:
         env:
           RUNNER_SUDO_PASSWORD: ${{ secrets.RUNNER_SUDO_PASSWORD }}
         run: echo "$RUNNER_SUDO_PASSWORD" | sudo -S chown -R $USER:$USER build Library
+
+      - name: Free Disk Space
+        if: always()
+        run: |
+          echo "Pruning dangling docker images..."
+          docker system prune -f
+          echo "Remaining disk space:"
+          df -h
 
       - uses: actions/upload-artifact@v4
         with:
