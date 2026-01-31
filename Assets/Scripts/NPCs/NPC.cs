@@ -30,6 +30,10 @@ public class NPC : MonoBehaviour
     private bool _hasDancingParam = false;
     
     private Waypoint _currentSmartWaypoint;
+    
+    // Debug
+    [SerializeField] private bool showDebugStatus = true;
+    private TextMesh _debugTextMesh;
 
     void Start()
     {
@@ -44,13 +48,15 @@ public class NPC : MonoBehaviour
             if (param.name == "IsDancing") _hasDancingParam = true;
         }
         
-        // Auto-register with Manager
         if (InfectionManager.Instance != null) 
             InfectionManager.Instance.RegisterNPC(this);
 
-        if (waypoints.Length > 0)
+        MoveToNextWaypoint();
+
+        if (showDebugStatus)
         {
-            MoveToNextWaypoint();
+            CreateDebugLabel();
+            UpdateDebugLabel();
         }
     }
 
@@ -66,6 +72,12 @@ public class NPC : MonoBehaviour
                  FacePlayer(); 
                  // If staring, maybe slow down agent?
             }
+        }
+
+        if (_debugTextMesh != null)
+        {
+            // Billboard effect: Always face camera
+            _debugTextMesh.transform.rotation = Camera.main.transform.rotation;
         }
 
         // 1. Dialogue State Check
@@ -169,6 +181,8 @@ public class NPC : MonoBehaviour
             case InfectionStage.Stare:
                 break;
         }
+        
+        UpdateDebugLabel();
     }
 
     private IEnumerator CoughRoutine()
@@ -266,7 +280,7 @@ public class NPC : MonoBehaviour
     // Find nearby NPCs and look at the center of the group
     private void FaceGroup()
     {
-        if (_anim.GetBool("IsDancing")) return;
+        if (_hasDancingParam && _anim.GetBool("IsDancing")) return;
 
         Collider[] hits = Physics.OverlapSphere(transform.position, socialRadius);
         Vector3 centerPoint = Vector3.zero;
@@ -277,7 +291,6 @@ public class NPC : MonoBehaviour
             if (hit.GetComponent<NPC>() != null && hit.gameObject != gameObject)
             {
                 // Phase 3: Invasion of Space - We might look AT a specific person too intensely
-                // For now, keep looking at group center but maybe we modify the position calculation later
                 centerPoint += hit.transform.position;
                 count++;
             }
@@ -289,7 +302,6 @@ public class NPC : MonoBehaviour
             Vector3 direction = (centerPoint - transform.position).normalized;
             
             // Phase 3 Logic: If Social invasion, maybe we look slightly OFF center or too direct?
-            // Keeping it simple for now.
             
             direction.y = 0;
             if (direction != Vector3.zero)
@@ -297,5 +309,36 @@ public class NPC : MonoBehaviour
                 transform.rotation = Quaternion.LookRotation(direction);
             }
         }
+    }
+    // --- Debug ---
+    private void CreateDebugLabel()
+    {
+        GameObject labelObj = new GameObject("DebugLabel");
+        labelObj.transform.SetParent(this.transform);
+        labelObj.transform.localPosition = Vector3.up * 2.2f; // Above head
+        
+        _debugTextMesh = labelObj.AddComponent<TextMesh>();
+        _debugTextMesh.alignment = TextAlignment.Center;
+        _debugTextMesh.anchor = TextAnchor.LowerCenter;
+        _debugTextMesh.characterSize = 0.1f;
+        _debugTextMesh.fontSize = 60;
+        _debugTextMesh.color = Color.white;
+    }
+
+    private void UpdateDebugLabel()
+    {
+        if (_debugTextMesh == null) return;
+        
+        string colorHex = "white";
+        switch(currentStage)
+        {
+            case InfectionStage.Carrier: colorHex = "yellow"; break;
+            case InfectionStage.Cough: colorHex = "orange"; break;
+            case InfectionStage.Twitch: colorHex = "red"; break;
+            case InfectionStage.Social: colorHex = "magenta"; break;
+            case InfectionStage.Stare: colorHex = "purple"; break;
+        }
+        
+        _debugTextMesh.text = $"<color={colorHex}>{currentStage}</color>";
     }
 }

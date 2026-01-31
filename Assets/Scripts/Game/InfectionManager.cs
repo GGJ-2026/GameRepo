@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+using UnityEngine.InputSystem;
+
 public class InfectionManager : MonoBehaviour
 {
     public static InfectionManager Instance;
@@ -13,7 +15,7 @@ public class InfectionManager : MonoBehaviour
     
     [Header("Debug")]
     public bool isProgressionPaused = false;
-    [SerializeField] private KeyCode debugAdvanceKey = KeyCode.P;
+    [SerializeField] private Key debugAdvanceKey = Key.P;
 
     [Header("State")]
     [SerializeField] private NPC patientZero;
@@ -36,8 +38,28 @@ public class InfectionManager : MonoBehaviour
         // Auto-find waypoints if list is empty
         if (globalWaypoints.Count == 0)
         {
+            // Method 1: Find existing Waypoint scripts
             Waypoint[] FoundWaypoints = FindObjectsOfType<Waypoint>();
             globalWaypoints.AddRange(FoundWaypoints);
+
+            // Method 2: Fallback to Tags if none found
+            if (globalWaypoints.Count == 0)
+            {
+                GameObject[] taggedObjects = GameObject.FindGameObjectsWithTag("Waypoint");
+                foreach (var go in taggedObjects)
+                {
+                    // Check if script is missing, then add it
+                    Waypoint wp = go.GetComponent<Waypoint>();
+                    if (wp == null) wp = go.AddComponent<Waypoint>();
+                    
+                    globalWaypoints.Add(wp);
+                }
+                
+                if (globalWaypoints.Count > 0)
+                {
+                    Debug.Log($"InfectionManager: Auto-converted {globalWaypoints.Count} objects to Smart Waypoints.");
+                }
+            }
         }
 
         // Auto-infect a random NPC if none assigned
@@ -52,7 +74,7 @@ public class InfectionManager : MonoBehaviour
         if (patientZero == null) return;
         
         // Debug Input
-        if (Input.GetKeyDown(debugAdvanceKey))
+        if (Keyboard.current != null && Keyboard.current[debugAdvanceKey].wasPressedThisFrame)
         {
             AdvancePlague();
         }
