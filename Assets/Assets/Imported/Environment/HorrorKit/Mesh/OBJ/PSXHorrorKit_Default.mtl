@@ -1,0 +1,62 @@
+# Blender 4.3.2 MTL File: 'None'
+# www.blender.org
+
+newmtl Material.012
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+Pr 1.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd C:/Users/ianmc/OneDrive/Desktop/Sales/PSXHorrorKit/HorrorKit_3Dexter/Textures/Default/Flashlight/Flashlight_Tex_1024.png
+
+newmtl Material.013
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+Pr 1.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd C:/Users/ianmc/OneDrive/Desktop/Sales/PSXHorrorKit/HorrorKit_3Dexter/Textures/Default/Lock&Key/LockAndKey_Tex_1024.png
+
+newmtl Material.014
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+Pr 1.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd C:/Users/ianmc/OneDrive/Desktop/Sales/PSXHorrorKit/HorrorKit_3Dexter/Textures/Default/Knife/Knife_Tex_1024.png
+
+newmtl Material.015
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+Pr 1.000000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd C:/Users/ianmc/OneDrive/Desktop/Sales/PSXHorrorKit/HorrorKit_3Dexter/Textures/Default/Radio/Radio_Tex_1024.png
