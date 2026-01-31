@@ -55,28 +55,53 @@ public class FirstPersonController : MonoBehaviour
     {
         _characterController = GetComponent<CharacterController>();
         _interactionController = GetComponentInChildren<InteractionController>();
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        SetCursorState(locked: true);
     }
 
     void Update()
     {
-        HandleLook();
-        HandleMovement();
-        HandleCrouch();
-        HandleInteraction();
+        bool isDialogActive = DialogManager.Instance != null && DialogManager.Instance.IsDialogOpen;
+        if (isDialogActive)
+        {
+            HandleDialogInput();
+            ApplyGravityOnly(); 
+        }
+        else
+        {
+            HandleLook();
+            HandleMovement();
+            HandleCrouch();
+            HandleInteraction();
+        }
+    }
+
+    // --- Handler for Dialog State ---
+    private void HandleDialogInput()
+    {
+        if (interactAction.WasPerformedThisFrame())
+        {
+            DialogManager.Instance.AdvanceDialog();
+        }
+    }
+
+    private void HandleInteraction()
+    {
+        if (interactAction.WasPerformedThisFrame())
+        {
+            if (_interactionController != null)
+            {
+                _interactionController.Interact();
+            }
+        }
     }
 
     private void HandleLook()
     {
         Vector2 lookInput = lookAction.ReadValue<Vector2>();
-
         float mouseX = lookInput.x * _mouseSensitivity;
         float mouseY = lookInput.y * _mouseSensitivity;
 
         transform.Rotate(Vector3.up * mouseX);
-
         _rotationX += -mouseY;
         _rotationX = Mathf.Clamp(_rotationX, -_lookXLimit, _lookXLimit);
         
@@ -84,41 +109,27 @@ public class FirstPersonController : MonoBehaviour
             _cameraTransform.localRotation = Quaternion.Euler(_rotationX, 0, 0);
     }
 
-    private void HandleCrouch()
-    {
-        // Read input - default to 0 if action is not set or not pressed
-        bool isCrouching = crouchAction != null && crouchAction.ReadValue<float>() > 0.5f;
-        
-        float targetHeight = isCrouching ? _crouchHeight : _standHeight;
-        float currentHeight = _characterController.height;
-        
-        // Use a simple lerp for height
-        if (Mathf.Abs(currentHeight - targetHeight) > 0.01f)
-        {
-            float newHeight = Mathf.MoveTowards(currentHeight, targetHeight, _crouchTransitionSpeed * Time.deltaTime);
-            
-            _characterController.height = newHeight;
-            _characterController.center = new Vector3(0, newHeight / 2.0f, 0);
-        }
-    }
-
     private void HandleMovement()
     {
-        // Read Vector2 from the Move Action
         Vector2 inputVector = moveAction.ReadValue<Vector2>();
-
         Vector3 move = transform.right * inputVector.x + transform.forward * inputVector.y;
 
         float currentSpeed = (crouchAction != null && crouchAction.ReadValue<float>() > 0.5f) ? _crouchSpeed : _moveSpeed;
         _characterController.Move(move * currentSpeed * Time.deltaTime);
 
+        ApplyGravityOnly();
+    }
+
+    private void ApplyGravityOnly()
+    {
         if (_characterController.isGrounded && _velocity.y < 0)
         {
             _velocity.y = -2f;
         }
 
-        // Check if Jump was pressed this frame
-        if (jumpAction.WasPerformedThisFrame() && _characterController.isGrounded)
+        // Only allow jumping if NOT in dialog
+        bool isDialogActive = DialogManager.Instance != null && DialogManager.Instance.IsDialogOpen;
+        if (!isDialogActive && jumpAction.WasPerformedThisFrame() && _characterController.isGrounded)
         {
             _velocity.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
         }
@@ -127,15 +138,23 @@ public class FirstPersonController : MonoBehaviour
         _characterController.Move(_velocity * Time.deltaTime);
     }
 
-    private void HandleInteraction()
+    private void HandleCrouch()
     {
-        // Only try to interact if the key was pressed this frame
-        if (interactAction.WasPerformedThisFrame())
+        bool isCrouching = crouchAction != null && crouchAction.ReadValue<float>() > 0.5f;
+        float targetHeight = isCrouching ? _crouchHeight : _standHeight;
+        float currentHeight = _characterController.height;
+        
+        if (Mathf.Abs(currentHeight - targetHeight) > 0.01f)
         {
-            if (_interactionController != null)
-            {
-                _interactionController.Interact();
-            }
+            float newHeight = Mathf.MoveTowards(currentHeight, targetHeight, _crouchTransitionSpeed * Time.deltaTime);
+            _characterController.height = newHeight;
+            _characterController.center = new Vector3(0, newHeight / 2.0f, 0);
         }
+    }
+
+    private void SetCursorState(bool locked)
+    {
+        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !locked;
     }
 }
