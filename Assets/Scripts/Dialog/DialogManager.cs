@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Text;
+using UnityEngine.UI;
+using System.Collections;
 
 public class DialogManager : MonoBehaviour
 {
@@ -11,11 +13,16 @@ public class DialogManager : MonoBehaviour
     [SerializeField] private GameObject dialogPanel;
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private Image portraitImage;
     
     [Header("Settings")]
     [SerializeField] private int maxWordsPerPage = 25;
+    [SerializeField] private float typingSpeed = 0.05f;
 
     public bool IsDialogOpen { get; private set; } = false;
+    private bool isTyping = false;
+    private string currentMessage = "";
+    private Coroutine typingCoroutine;
 
     private Queue<string> _pages = new Queue<string>();
 
@@ -27,13 +34,26 @@ public class DialogManager : MonoBehaviour
         dialogPanel.SetActive(false);
     }
 
-public void StartDialog(string characterName, string fullText)
+public void StartDialog(string characterName, string fullText, Sprite portrait = null)
 {
     _pages.Clear();
     
     if (nameText != null) 
     {
         nameText.text = characterName;
+    }
+
+    if (portraitImage != null)
+    {
+        if (portrait != null)
+        {
+            portraitImage.sprite = portrait;
+            portraitImage.gameObject.SetActive(true);
+        }
+        else
+        {
+            portraitImage.gameObject.SetActive(false);
+        }
     }
 
     var slicedPages = SliceText(fullText, maxWordsPerPage);
@@ -50,9 +70,21 @@ public void StartDialog(string characterName, string fullText)
 
     public void AdvanceDialog()
     {
+        if (isTyping)
+        {
+            // If typing, skip to end
+            if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+            dialogText.text = currentMessage;
+            dialogText.maxVisibleCharacters = currentMessage.Length;
+            isTyping = false;
+            return;
+        }
+
         if (_pages.Count > 0)
         {
-            dialogText.text = _pages.Dequeue();
+            currentMessage = _pages.Dequeue();
+            if (typingCoroutine != null) StopCoroutine(typingCoroutine);
+            typingCoroutine = StartCoroutine(TypewriterEffect(currentMessage));
         }
         else
         {
@@ -60,8 +92,25 @@ public void StartDialog(string characterName, string fullText)
         }
     }
 
+    private IEnumerator TypewriterEffect(string message)
+    {
+        isTyping = true;
+        dialogText.text = message;
+        dialogText.maxVisibleCharacters = 0;
+
+        int totalChars = message.Length;
+        for (int i = 0; i <= totalChars; i++)
+        {
+            dialogText.maxVisibleCharacters = i;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+
+        isTyping = false;
+    }
+
     private void EndDialog()
     {
+        if (typingCoroutine != null) StopCoroutine(typingCoroutine);
         IsDialogOpen = false;
         dialogPanel.SetActive(false);
     }
