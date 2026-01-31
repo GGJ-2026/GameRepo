@@ -101,3 +101,11 @@ InitTestScene*.unity*
 # MacOS desktop services
 .DS_Store
 .DS_Store.meta  
+# AI Agent Files
+CLAUDE.md
+.cursorrules
+.windsurfrules
+.aider*
+.prompts/
+GEMINI.md
+.gemini/
