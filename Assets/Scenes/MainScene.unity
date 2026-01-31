@@ -2339,7 +2339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Waypoint
   areaType: 0
-  waitTimeModifier: 0
+  waitTimeModifier: 50
 --- !u!1001 &2079382130
 PrefabInstance:
   m_ObjectHideFlags: 0
