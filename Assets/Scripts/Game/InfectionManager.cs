@@ -7,8 +7,13 @@ public class InfectionManager : MonoBehaviour
     public static InfectionManager Instance;
 
     [Header("Settings")]
-    [SerializeField] private float phaseDuration = 30f; // Time between PZ phase advancements
+    [SerializeField] private List<float> phaseDurations = new List<float>() { 60f, 60f, 45f, 30f, 30f }; // Duration for Phase 0, 1, 2, 3, 4
+    [SerializeField] private float defaultPhaseDuration = 30f;
     [SerializeField] private float infectionCheckInterval = 1.0f;
+    
+    [Header("Debug")]
+    public bool isProgressionPaused = false;
+    [SerializeField] private KeyCode debugAdvanceKey = KeyCode.P;
 
     [Header("State")]
     [SerializeField] private NPC patientZero;
@@ -45,14 +50,30 @@ public class InfectionManager : MonoBehaviour
     private void Update()
     {
         if (patientZero == null) return;
+        
+        // Debug Input
+        if (Input.GetKeyDown(debugAdvanceKey))
+        {
+            AdvancePlague();
+        }
+
+        if (isProgressionPaused) return;
 
         _timer += Time.deltaTime;
+        
+        float currentLimit = GetCurrentPhaseDuration();
 
-        if (_timer >= phaseDuration)
+        if (_timer >= currentLimit)
         {
             _timer = 0;
             AdvancePlague();
         }
+    }
+    
+    private float GetCurrentPhaseDuration()
+    {
+        if (currentPZPhase < phaseDurations.Count) return phaseDurations[currentPZPhase];
+        return defaultPhaseDuration;
     }
 
     public void RegisterNPC(NPC npc)
@@ -71,16 +92,18 @@ public class InfectionManager : MonoBehaviour
         Debug.Log($"Infection Started. Patient Zero is: {patientZero.name}");
     }
 
-    private void AdvancePlague()
+    [ContextMenu("Force Advance Plague")]
+    public void AdvancePlague()
     {
         // 1. Advance Patient Zero
         currentPZPhase++;
         if (currentPZPhase > 4) currentPZPhase = 4; // Cap at max phase
 
-        patientZero.SetInfectionStage((NPC.InfectionStage)currentPZPhase);
+        // Map Phase Index (0-4) to Enum (1-5), because 0 is None
+        patientZero.SetInfectionStage((NPC.InfectionStage)(currentPZPhase + 1));
         Debug.Log($"Patient Zero advanced to Phase {currentPZPhase}");
 
-        // 2. Infect a new victim (start them at Phase 1)
+        // 2. Infect a new victim (start them at Phase 1: Cough)
         NPC victim = GetRandomHealthyNPC();
         if (victim != null)
         {
