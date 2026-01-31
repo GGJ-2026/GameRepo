@@ -26,12 +26,23 @@ public class NPC : MonoBehaviour
     private Animator _anim;
     private bool _isTalking = false;
     private bool _isWaiting = false;
+    private bool _hasWalkingParam = false;
+    private bool _hasDancingParam = false;
+    
+    private Waypoint _currentSmartWaypoint;
 
     void Start()
     {
         _agent = GetComponent<NavMeshAgent>();
         _anim = GetComponent<Animator>();
         _agent.autoBraking = true;
+        
+        // Cache Animator parameters
+        foreach (var param in _anim.parameters)
+        {
+            if (param.name == "IsWalking") _hasWalkingParam = true;
+            if (param.name == "IsDancing") _hasDancingParam = true;
+        }
         
         // Auto-register with Manager
         if (InfectionManager.Instance != null) 
@@ -71,15 +82,18 @@ public class NPC : MonoBehaviour
         }
 
         // 2. Movement Logic
-        // Check if we've reached the destination
-        if (!_isWaiting && !_agent.pathPending && _agent.remainingDistance < 0.5f)
+        // Check if we've reached the destination (Only if on NavMesh)
+        if (_agent.isOnNavMesh && !_isWaiting && !_agent.pathPending && _agent.remainingDistance < 0.5f)
         {
             StartCoroutine(WaitOrDanceRoutine());
         }
 
         // 3. Animation Sync
         // Tell the animator if we are moving (velocity > 0.1)
-        _anim.SetBool("IsWalking", _agent.velocity.magnitude > 0.1f);
+        if (_hasWalkingParam)
+        {
+             _anim.SetBool("IsWalking", _agent.velocity.magnitude > 0.1f);
+        }
     }
 
     // --- Interaction System ---
@@ -114,11 +128,24 @@ public class NPC : MonoBehaviour
 
     private void MoveToNextWaypoint()
     {
-        if (waypoints.Length == 0) return;
+        // Priority 1: Local Waypoints
+        if (waypoints.Length > 0)
+        {
+            int randomIndex = Random.Range(0, waypoints.Length);
+            _agent.SetDestination(waypoints[randomIndex].position);
+            return;
+        }
 
-        // Pick a random spot
-        int randomIndex = Random.Range(0, waypoints.Length);
-        _agent.SetDestination(waypoints[randomIndex].position);
+        // Priority 2: Global Waypoints
+        if (InfectionManager.Instance != null)
+        {
+            Waypoint dest = InfectionManager.Instance.GetCleanWaypoint();
+            if (dest != null)
+            {
+                _currentSmartWaypoint = dest;
+                _agent.SetDestination(dest.transform.position);
+            }
+        }
     }
 
     public void SetInfectionStage(InfectionStage stage)
@@ -189,19 +216,49 @@ public class NPC : MonoBehaviour
         // Phase 3 (Social Invasion): Stand weirdly close or ignore distance
         FaceGroup();
         
-        bool shouldDance = Random.value < danceChance;
+        // --- SMART WAYPOINT LOGIC ---
+        bool shouldDance = false;
+        float waitModifier = 0f;
+
+        if (_currentSmartWaypoint != null)
+        {
+            waitModifier = _currentSmartWaypoint.waitTimeModifier;
+
+            if (_currentSmartWaypoint.areaType == Waypoint.AreaType.DanceFloor)
+            {
+                shouldDance = true; // Always dance on dance floor
+            }
+            else if (_currentSmartWaypoint.areaType == Waypoint.AreaType.Bar)
+            {
+                // TODO: Drinking animation trigger? For now just wait longer.
+                waitModifier += 2.0f; 
+                shouldDance = false;
+            }
+            else
+            {
+                // Generic Area: Random chance
+                shouldDance = Random.value < danceChance;
+            }
+        }
+        else
+        {
+            // Fallback if no smart waypoint (legacy)
+             shouldDance = Random.value < danceChance;
+        }
         
         // Less dancing if infected
-        if (shouldDance && currentStage == InfectionStage.None)
+        if (shouldDance && currentStage == InfectionStage.None && _hasDancingParam)
         {
             _anim.SetBool("IsDancing", true);
         }
 
         // Wait time increases if you are the Carrier
         float finalWaitTime = (currentStage == InfectionStage.Carrier) ? waitTime + 2.0f : waitTime;
+        finalWaitTime += waitModifier;
+        
         yield return new WaitForSeconds(finalWaitTime);
 
-        _anim.SetBool("IsDancing", false);
+        if (_hasDancingParam) _anim.SetBool("IsDancing", false);
         _isWaiting = false;
         MoveToNextWaypoint();
     }
