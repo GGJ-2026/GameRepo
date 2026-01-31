@@ -31,13 +31,11 @@ public void StartDialog(string characterName, string fullText)
 {
     _pages.Clear();
     
-    // Update the Name Tag UI
     if (nameText != null) 
     {
         nameText.text = characterName;
     }
 
-    // Slice the text into pages
     var slicedPages = SliceText(fullText, maxWordsPerPage);
     foreach (string page in slicedPages)
     {

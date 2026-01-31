@@ -24,7 +24,7 @@ public class FirstPersonController : MonoBehaviour
 
     [Header("Look Parameters")]
     [SerializeField] private Transform _cameraTransform;
-    [SerializeField] private float _mouseSensitivity = 0.1f;
+    [SerializeField] public float _mouseSensitivity = 0.1f;
     [SerializeField] private float _lookXLimit = 85.0f;
 
     private CharacterController _characterController;
@@ -102,17 +102,35 @@ public class FirstPersonController : MonoBehaviour
         float mouseY = lookInput.y * _mouseSensitivity;
 
         transform.Rotate(Vector3.up * mouseX);
+
         _rotationX += -mouseY;
         _rotationX = Mathf.Clamp(_rotationX, -_lookXLimit, _lookXLimit);
         
-        if (_cameraTransform != null)
+        if (_cameraTransform != null && _cameraTransform != transform)
+        {
             _cameraTransform.localRotation = Quaternion.Euler(_rotationX, 0, 0);
+        }
+        else
+        {
+            // Fallback: Single object setup (apply pitch to self, preserve yaw)
+            // Note: This applies rotation to the capsule which is non-ideal but functional
+            transform.localRotation = Quaternion.Euler(_rotationX, transform.localEulerAngles.y, 0);
+        }
     }
 
     private void HandleMovement()
     {
         Vector2 inputVector = moveAction.ReadValue<Vector2>();
-        Vector3 move = transform.right * inputVector.x + transform.forward * inputVector.y;
+        
+        Vector3 forward = transform.forward;
+        forward.y = 0;
+        forward.Normalize();
+
+        Vector3 right = transform.right;
+        right.y = 0;
+        right.Normalize();
+
+        Vector3 move = right * inputVector.x + forward * inputVector.y;
 
         float currentSpeed = (crouchAction != null && crouchAction.ReadValue<float>() > 0.5f) ? _crouchSpeed : _moveSpeed;
         _characterController.Move(move * currentSpeed * Time.deltaTime);
