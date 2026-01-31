@@ -8,19 +8,13 @@ public class FirstPersonController : MonoBehaviour
     public InputAction moveAction;
     public InputAction lookAction;
     public InputAction jumpAction;
-    public InputAction crouchAction;
     public InputAction interactAction;
 
     [Header("Movement Parameters")]
     [SerializeField] private float _moveSpeed = 5.0f;
-    [SerializeField] private float _crouchSpeed = 2.5f;
     [SerializeField] private float _gravity = -9.81f;
     [SerializeField] private float _jumpHeight = 1.0f;
-
-    [Header("Crouch Parameters")]
-    [SerializeField] private float _crouchHeight = 1.0f;
-    [SerializeField] private float _standHeight = 2.0f;
-    [SerializeField] private float _crouchTransitionSpeed = 10.0f;
+    [SerializeField] private float _standHeight = 3.0f;
 
     [Header("Look Parameters")]
     [SerializeField] private Transform _cameraTransform;
@@ -38,7 +32,6 @@ public class FirstPersonController : MonoBehaviour
         moveAction.Enable();
         lookAction.Enable();
         jumpAction.Enable();
-        crouchAction.Enable();
         interactAction.Enable();
     }
 
@@ -47,7 +40,6 @@ public class FirstPersonController : MonoBehaviour
         moveAction.Disable();
         lookAction.Disable();
         jumpAction.Disable();
-        crouchAction.Disable();
         interactAction.Disable();
     }
 
@@ -55,11 +47,23 @@ public class FirstPersonController : MonoBehaviour
     {
         _characterController = GetComponent<CharacterController>();
         _interactionController = GetComponentInChildren<InteractionController>();
+        
+        // Auto-assign camera if missing
+        if (_cameraTransform == null)
+        {
+            _cameraTransform = GetComponentInChildren<Camera>()?.transform;
+            if (_cameraTransform == null) _cameraTransform = Camera.main?.transform;
+        }
+
         SetCursorState(locked: true);
+        UpdateHeight(); // Set Initial Height
     }
 
     void Update()
     {
+        // Enforce height in Update to allow Inspector tweaking at runtime
+        UpdateHeight();
+
         bool isDialogActive = DialogManager.Instance != null && DialogManager.Instance.IsDialogOpen;
         if (isDialogActive)
         {
@@ -70,7 +74,6 @@ public class FirstPersonController : MonoBehaviour
         {
             HandleLook();
             HandleMovement();
-            HandleCrouch();
             HandleInteraction();
         }
     }
@@ -132,8 +135,7 @@ public class FirstPersonController : MonoBehaviour
 
         Vector3 move = right * inputVector.x + forward * inputVector.y;
 
-        float currentSpeed = (crouchAction != null && crouchAction.ReadValue<float>() > 0.5f) ? _crouchSpeed : _moveSpeed;
-        _characterController.Move(move * currentSpeed * Time.deltaTime);
+        _characterController.Move(move * _moveSpeed * Time.deltaTime);
 
         ApplyGravityOnly();
     }
@@ -156,17 +158,20 @@ public class FirstPersonController : MonoBehaviour
         _characterController.Move(_velocity * Time.deltaTime);
     }
 
-    private void HandleCrouch()
+    private void UpdateHeight()
     {
-        bool isCrouching = crouchAction != null && crouchAction.ReadValue<float>() > 0.5f;
-        float targetHeight = isCrouching ? _crouchHeight : _standHeight;
-        float currentHeight = _characterController.height;
-        
-        if (Mathf.Abs(currentHeight - targetHeight) > 0.01f)
+        // Force height and camera position
+        if (Mathf.Abs(_characterController.height - _standHeight) > 0.01f)
         {
-            float newHeight = Mathf.MoveTowards(currentHeight, targetHeight, _crouchTransitionSpeed * Time.deltaTime);
-            _characterController.height = newHeight;
-            _characterController.center = new Vector3(0, newHeight / 2.0f, 0);
+            _characterController.height = _standHeight;
+            _characterController.center = new Vector3(0, _standHeight / 2.0f, 0);
+        }
+
+        if (_cameraTransform != null)
+        {
+            Vector3 camPos = _cameraTransform.localPosition;
+            camPos.y = _standHeight * 0.9f; // Eye level
+            _cameraTransform.localPosition = camPos;
         }
     }
 
