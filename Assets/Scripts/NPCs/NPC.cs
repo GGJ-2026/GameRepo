@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.AI; // Required for NavMesh
+using UnityEngine.AI;
 using System.Collections;
 
 [RequireComponent(typeof(NavMeshAgent))]
@@ -9,7 +9,11 @@ public class NPC : MonoBehaviour
     [Header("Interaction Data")]
     public string characterName = "WAITER";
     public Sprite facePortrait;
-    [TextArea(3, 10)] public string dialogue = "I saw the lady in red...";
+    [Header("Dialog Data")]
+    [TextArea(3, 10)] public string npcDialog1 = "I saw the lady in red...";
+    public string playerResponse1 = "Tell me more...";
+    [TextArea(3, 10)] public string npcDialog2 = "She was dancing like a maniac.";
+    public string playerResponse2 = "I see.";
 
     [Header("Movement Settings")]
     [SerializeField] private Transform[] waypoints;
@@ -119,7 +123,7 @@ public class NPC : MonoBehaviour
         _anim.SetBool("IsWalking", false);
         _anim.SetBool("IsDancing", false);
 
-        DialogManager.Instance.StartDialog(characterName, dialogue, facePortrait);
+        DialogManager.Instance.StartDialog(characterName, npcDialog1, npcDialog2, playerResponse1, playerResponse2, facePortrait);
     }
 
     private void StopTalking()
