@@ -31,23 +31,19 @@ public class GameEndManager : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        // Hide end screen on start
         HideEndScreen();
     }
 
     private void Update()
     {
-        // Wait for any input to return to menu (using new Input System)
         if (_waitingForInput)
         {
-            // Check keyboard
             if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
             {
                 ReturnToMenu();
                 return;
             }
             
-            // Check mouse clicks
             if (Mouse.current != null && 
                 (Mouse.current.leftButton.wasPressedThisFrame || 
                  Mouse.current.rightButton.wasPressedThisFrame))
@@ -55,21 +51,9 @@ public class GameEndManager : MonoBehaviour
                 ReturnToMenu();
                 return;
             }
-            
-            // Check gamepad
-            if (Gamepad.current != null && 
-                (Gamepad.current.aButton.wasPressedThisFrame || 
-                 Gamepad.current.startButton.wasPressedThisFrame))
-            {
-                ReturnToMenu();
-                return;
-            }
         }
     }
 
-    /// <summary>
-    /// Called when the player stabs an NPC. Checks if it's Patient Zero.
-    /// </summary>
     public void EndGame(NPC targetNPC)
     {
         if (_gameEnded) return;
@@ -87,39 +71,31 @@ public class GameEndManager : MonoBehaviour
 
     private void ShowEndScreen(bool isWin)
     {
-        // Unlock cursor for menu interaction
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Pause game time
         Time.timeScale = 0f;
 
-        // Set the text FIRST before showing anything
         string displayText = isWin ? winText : loseText;
         if (endScreenText != null)
         {
             endScreenText.text = displayText;
         }
 
-        // Activate the canvas
         if (endScreenCanvas != null)
         {
             endScreenCanvas.gameObject.SetActive(true);
         }
 
-        // Activate the panel
         if (endScreenPanel != null)
         {
             endScreenPanel.SetActive(true);
         }
-
-        // Start fade in
         StartCoroutine(FadeInAndWaitForInput());
     }
 
     private IEnumerator FadeInAndWaitForInput()
     {
-        // Set initial alpha to 0
         if (backgroundImage != null)
         {
             Color startColor = backgroundColor;
@@ -134,14 +110,12 @@ public class GameEndManager : MonoBehaviour
             endScreenText.color = textColor;
         }
 
-        // Fade in over time (using unscaled time since game is paused)
         float elapsed = 0f;
         while (elapsed < fadeDuration)
         {
             elapsed += Time.unscaledDeltaTime;
             float t = Mathf.Clamp01(elapsed / fadeDuration);
 
-            // Fade background
             if (backgroundImage != null)
             {
                 Color bgColor = backgroundColor;
@@ -149,7 +123,6 @@ public class GameEndManager : MonoBehaviour
                 backgroundImage.color = bgColor;
             }
 
-            // Fade text
             if (endScreenText != null)
             {
                 Color textColor = endScreenText.color;
@@ -160,7 +133,6 @@ public class GameEndManager : MonoBehaviour
             yield return null;
         }
 
-        // Ensure final alpha is 1
         if (backgroundImage != null)
         {
             backgroundImage.color = backgroundColor;
