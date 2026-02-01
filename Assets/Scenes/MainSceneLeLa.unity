@@ -9827,7 +9827,15 @@ MonoBehaviour:
     m_Id: ebcfba7f-54b3-406e-8fd8-a806d3f182ff
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 57a7bb10-38db-4600-ba0d-fce1da431124
+      m_Path: <Mouse>/leftButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Stab
+      m_Flags: 0
     m_Flags: 0
   _moveSpeed: 5
   _gravity: -9.81
