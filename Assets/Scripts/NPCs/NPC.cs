@@ -14,6 +14,8 @@ public class NPC : MonoBehaviour
     public string playerResponse1 = "Tell me more...";
     [TextArea(3, 10)] public string npcDialog2 = "She was dancing like a maniac.";
     public string playerResponse2 = "I see.";
+    [TextArea(3, 10)] public string npcDialog3 = "And then she vanished.";
+    public string playerResponse3 = "Wow.";
 
     [Header("Movement Settings")]
     [SerializeField] private Transform[] waypoints;
@@ -123,7 +125,7 @@ public class NPC : MonoBehaviour
         _anim.SetBool("IsWalking", false);
         _anim.SetBool("IsDancing", false);
 
-        DialogManager.Instance.StartDialog(characterName, npcDialog1, npcDialog2, playerResponse1, playerResponse2, facePortrait);
+        DialogManager.Instance.StartDialog(characterName, npcDialog1, npcDialog2, npcDialog3, playerResponse1, playerResponse2, playerResponse3, facePortrait);
     }
 
     private void StopTalking()
