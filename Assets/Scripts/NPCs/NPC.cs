@@ -23,6 +23,10 @@ public class NPC : MonoBehaviour
     [SerializeField] private float danceChance = 0.3f;
     [SerializeField] private float socialRadius = 5.0f;
 
+    [Header("Infection Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip coughSound;
+
     public enum InfectionStage { None, Carrier, Cough, Twitch, Social, Stare }
     [Header("Infection Status")]
     public InfectionStage currentStage = InfectionStage.None;
@@ -36,6 +40,19 @@ public class NPC : MonoBehaviour
     private bool _hasDancingParam = false;
     
     private Waypoint _currentSmartWaypoint;
+    
+    // Infection behavior flags
+    private bool _coughActive = false;
+    private bool _twitchActive = false;
+    private bool _socialActive = false;
+    private bool _stareActive = false;
+    private bool _isStaring = false;
+    
+    // Proximity detection - track nearby NPC distances
+    private System.Collections.Generic.Dictionary<NPC, float> _lastKnownDistances = new System.Collections.Generic.Dictionary<NPC, float>();
+    private float _proximityCheckTimer = 0f;
+    private const float PROXIMITY_CHECK_INTERVAL = 0.5f;
+    private const float APPROACH_THRESHOLD = 1.5f; // How much closer before we notice
     
     // Debug
     [SerializeField] private bool showDebugStatus = true;
@@ -66,21 +83,29 @@ public class NPC : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        // Clean up waypoint reservation when NPC is destroyed
+        if (InfectionManager.Instance != null)
+        {
+            InfectionManager.Instance.ReleaseWaypoint(this);
+        }
+    }
+
     void Update()
     {
         // Phase 4: Stare Logic (Check periodically or always if close)
-        if (currentStage == InfectionStage.Stare && !_isTalking)
+        if (currentStage == InfectionStage.Stare && !_isTalking && Camera.main != null)
         {
             // If player is close, stare at them
             float distToPlayer = Vector3.Distance(transform.position, Camera.main.transform.position);
             if (distToPlayer < 8.0f)
             {
                  FacePlayer(); 
-                 // If staring, maybe slow down agent?
             }
         }
 
-        if (_debugTextMesh != null)
+        if (_debugTextMesh != null && Camera.main != null)
         {
             // Billboard effect: Always face camera
             _debugTextMesh.transform.rotation = Camera.main.transform.rotation;
@@ -97,6 +122,17 @@ public class NPC : MonoBehaviour
         {
             FacePlayer();
             return;
+        }
+        
+        // Proximity detection - look at NPCs that approached us
+        if (!_isWaiting && !_isStaring)
+        {
+            _proximityCheckTimer += Time.deltaTime;
+            if (_proximityCheckTimer >= PROXIMITY_CHECK_INTERVAL)
+            {
+                _proximityCheckTimer = 0f;
+                CheckForApproachingNPCs();
+            }
         }
 
         // 2. Movement Logic
@@ -133,35 +169,106 @@ public class NPC : MonoBehaviour
         _isTalking = false;
         _agent.isStopped = false;
     }
+    
+    private void CheckForApproachingNPCs()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, socialRadius);
+        NPC approachingNPC = null;
+        float biggestApproach = 0f;
+        
+        foreach (var hit in hits)
+        {
+            NPC other = hit.GetComponent<NPC>();
+            if (other != null && other != this)
+            {
+                float currentDist = Vector3.Distance(transform.position, other.transform.position);
+                
+                // Check if we have a previous distance for this NPC
+                if (_lastKnownDistances.TryGetValue(other, out float previousDist))
+                {
+                    float approachAmount = previousDist - currentDist;
+                    
+                    // If they got significantly closer, remember them
+                    if (approachAmount > APPROACH_THRESHOLD && approachAmount > biggestApproach)
+                    {
+                        biggestApproach = approachAmount;
+                        approachingNPC = other;
+                    }
+                }
+                
+                // Update the distance
+                _lastKnownDistances[other] = currentDist;
+            }
+        }
+        
+        // If someone approached us, look at them
+        if (approachingNPC != null && !_isWaiting)
+        {
+            Vector3 direction = (approachingNPC.transform.position - transform.position).normalized;
+            direction.y = 0;
+            if (direction != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(direction);
+            }
+        }
+        
+        // Clean up NPCs that are no longer nearby
+        var keysToRemove = new System.Collections.Generic.List<NPC>();
+        foreach (var kvp in _lastKnownDistances)
+        {
+            if (kvp.Key == null || Vector3.Distance(transform.position, kvp.Key.transform.position) > socialRadius * 2f)
+            {
+                keysToRemove.Add(kvp.Key);
+            }
+        }
+        foreach (var key in keysToRemove)
+        {
+            _lastKnownDistances.Remove(key);
+        }
+    }
 
     private void FacePlayer()
     {
+        if (Camera.main == null) return;
         Vector3 direction = (Camera.main.transform.position - transform.position).normalized;
         direction.y = 0;
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+        }
     }
 
     // --- AI Logic ---
 
     private void MoveToNextWaypoint()
     {
-        // Priority 1: Local Waypoints
+        // Release any previous waypoint reservation
+        if (InfectionManager.Instance != null)
+        {
+            InfectionManager.Instance.ReleaseWaypoint(this);
+        }
+        
+        // Priority 1: Local Waypoints (no reservation needed for local)
         if (waypoints.Length > 0)
         {
             int randomIndex = Random.Range(0, waypoints.Length);
             _agent.SetDestination(waypoints[randomIndex].position);
+            _currentSmartWaypoint = null;
             return;
         }
 
-        // Priority 2: Global Waypoints
+        // Priority 2: Global Waypoints with reservation
         if (InfectionManager.Instance != null)
         {
-            Waypoint dest = InfectionManager.Instance.GetCleanWaypoint();
+            Waypoint dest = InfectionManager.Instance.GetCleanWaypoint(this);
             if (dest != null)
             {
                 _currentSmartWaypoint = dest;
                 _agent.SetDestination(dest.transform.position);
+                
+                // Reserve this waypoint so others don't target it
+                InfectionManager.Instance.ReserveWaypoint(dest, this);
             }
         }
     }
@@ -170,22 +277,54 @@ public class NPC : MonoBehaviour
     {
         currentStage = stage;
         
-        // Reset/Apply modifiers based on stage
-        _agent.speed = 3.5f; // Reset to default (assuming 3.5)
+        _agent.speed = 3.5f;
         
-        switch (currentStage)
+        // STACKING BEHAVIORS: Higher phases include lower phase behaviors
+        // Phase 1+ = Cough
+        // Phase 2+ = Cough + Twitch
+        // Phase 3+ = Cough + Twitch + Social
+        // Phase 4+ = Cough + Twitch + Social + Stare
+        
+        bool shouldCough = (int)stage >= (int)InfectionStage.Cough;
+        bool shouldTwitch = (int)stage >= (int)InfectionStage.Twitch;
+        bool shouldSocial = (int)stage >= (int)InfectionStage.Social;
+        bool shouldStare = (int)stage >= (int)InfectionStage.Stare;
+        
+        // Start cough if needed and not already running
+        if (shouldCough && !_coughActive)
         {
-            case InfectionStage.Carrier:
-                _agent.speed *= 0.8f; // Slower
-                break;
-            case InfectionStage.Twitch:
-                StartCoroutine(TwitchRoutine());
-                break;
-            case InfectionStage.Cough:
-                StartCoroutine(CoughRoutine());
-                break;
-            case InfectionStage.Stare:
-                break;
+            _coughActive = true;
+            StartCoroutine(CoughRoutine());
+            Debug.Log($"[INFECTION] {characterName}: Cough behavior STARTED");
+        }
+        
+        // Start twitch if needed
+        if (shouldTwitch && !_twitchActive)
+        {
+            _twitchActive = true;
+            StartCoroutine(TwitchRoutine());
+            Debug.Log($"[INFECTION] {characterName}: Twitch behavior STARTED");
+        }
+        
+        // Social behavior flag (handled in WaitOrDanceRoutine)
+        if (shouldSocial && !_socialActive)
+        {
+            _socialActive = true;
+            Debug.Log($"[INFECTION] {characterName}: Social Invasion behavior STARTED");
+        }
+        
+        // Start stare if needed
+        if (shouldStare && !_stareActive)
+        {
+            _stareActive = true;
+            StartCoroutine(StareRoutine());
+            Debug.Log($"[INFECTION] {characterName}: Stare behavior STARTED");
+        }
+        
+        // Carrier slows down
+        if (stage == InfectionStage.Carrier)
+        {
+            _agent.speed *= 0.8f;
         }
         
         UpdateDebugLabel();
@@ -193,38 +332,137 @@ public class NPC : MonoBehaviour
 
     private IEnumerator CoughRoutine()
     {
-        while (currentStage == InfectionStage.Cough)
+        while (_coughActive)
         {
-            yield return new WaitForSeconds(Random.Range(5f, 15f));
-            if (!_isTalking)
+            yield return new WaitForSeconds(Random.Range(10f, 30f));
+            if (!_isTalking && _coughActive)
             {
-                Debug.Log($"{characterName}: *Coughs*");
-                // TODO: Play Audio Clip
-                _anim.SetTrigger("Cough"); // Assuming trigger exists, or remove if not
+                Debug.Log($"[COUGH] {characterName}: *Coughs*");
+                
+                // Play cough sound
+                if (audioSource != null && coughSound != null)
+                {
+                    audioSource.PlayOneShot(coughSound);
+                }
             }
         }
     }
 
     private IEnumerator TwitchRoutine()
     {
-        while (currentStage == InfectionStage.Twitch)
+        while (_twitchActive)
         {
             yield return new WaitForSeconds(Random.Range(3f, 8f));
-            if (!_isTalking && !_agent.pathPending && _agent.velocity.magnitude > 0.1f)
+            if (!_isTalking && _twitchActive && !_isStaring)
             {
-                // Quick spasmodic rotation
-                float duration = 0.2f;
-                Quaternion originalRot = transform.rotation;
-                Quaternion twitchRot = originalRot * Quaternion.Euler(0, Random.Range(-15, 15), 0);
+                Debug.Log($"[TWITCH] {characterName}: *Twitches erratically*");
                 
+                // Quick spasmodic rotation
+                float duration = 0.15f;
+                Quaternion originalRot = transform.rotation;
+                
+                // Twitch left
+                Quaternion twitchLeft = originalRot * Quaternion.Euler(0, -15f, 0);
                 float t = 0;
-                while(t < 1)
+                while (t < 1)
                 {
                     t += Time.deltaTime / duration;
-                    transform.rotation = Quaternion.Lerp(twitchRot, originalRot, t);
+                    transform.rotation = Quaternion.Lerp(originalRot, twitchLeft, t);
+                    yield return null;
+                }
+                
+                // Twitch right
+                Quaternion twitchRight = originalRot * Quaternion.Euler(0, 15f, 0);
+                t = 0;
+                while (t < 1)
+                {
+                    t += Time.deltaTime / duration;
+                    transform.rotation = Quaternion.Lerp(twitchLeft, twitchRight, t);
+                    yield return null;
+                }
+                
+                // Return to original
+                t = 0;
+                while (t < 1)
+                {
+                    t += Time.deltaTime / duration;
+                    transform.rotation = Quaternion.Lerp(twitchRight, originalRot, t);
                     yield return null;
                 }
             }
+        }
+    }
+    
+    private IEnumerator StareRoutine()
+    {
+        while (_stareActive)
+        {
+            // Wait random time before staring
+            yield return new WaitForSeconds(Random.Range(8f, 15f));
+            
+            if (!_isTalking && _stareActive && Camera.main != null)
+            {
+                // Check if player is in range
+                float distToPlayer = Vector3.Distance(transform.position, Camera.main.transform.position);
+                if (distToPlayer < 12f)
+                {
+                    Debug.Log($"[STARE] {characterName}: *Stares at player*");
+                    
+                    _isStaring = true;
+                    _agent.isStopped = true;
+                    
+                    // Stare for 2-3 seconds
+                    float stareDuration = Random.Range(2f, 3f);
+                    float stareTime = 0f;
+                    
+                    while (stareTime < stareDuration && _stareActive && Camera.main != null)
+                    {
+                        // Continuously face player
+                        FacePlayer();
+                        stareTime += Time.deltaTime;
+                        yield return null;
+                    }
+                    
+                    Debug.Log($"[STARE] {characterName}: *Stops staring, resumes behavior*");
+                    
+                    _isStaring = false;
+                    _agent.isStopped = false;
+                }
+            }
+        }
+    }
+    
+    // Phase 3: Move closer to nearest NPC after reaching waypoint
+    private void MoveCloserToNearestNPC()
+    {
+        if (!_socialActive) return;
+        
+        Collider[] hits = Physics.OverlapSphere(transform.position, socialRadius * 2f);
+        NPC closestNPC = null;
+        float closestDist = float.MaxValue;
+        
+        foreach (var hit in hits)
+        {
+            NPC other = hit.GetComponent<NPC>();
+            if (other != null && other != this)
+            {
+                float dist = Vector3.Distance(transform.position, other.transform.position);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestNPC = other;
+                }
+            }
+        }
+        
+        if (closestNPC != null && closestDist > 1.5f)
+        {
+            // Move to a point uncomfortably close to them (0.8 units away)
+            Vector3 direction = (closestNPC.transform.position - transform.position).normalized;
+            Vector3 targetPos = closestNPC.transform.position - direction * 0.8f;
+            _agent.SetDestination(targetPos);
+            
+            Debug.Log($"[SOCIAL] {characterName}: *Moves uncomfortably close to {closestNPC.characterName}*");
         }
     }
 
@@ -232,8 +470,20 @@ public class NPC : MonoBehaviour
     {
         _isWaiting = true;
         
-        // Socialize: Face nearby people
-        // Phase 3 (Social Invasion): Stand weirdly close or ignore distance
+        // Release waypoint reservation now that we've arrived
+        if (InfectionManager.Instance != null)
+        {
+            InfectionManager.Instance.ReleaseWaypoint(this);
+        }
+        
+        // Phase 3+: Move uncomfortably close to nearest NPC
+        if (_socialActive)
+        {
+            MoveCloserToNearestNPC();
+            yield return new WaitForSeconds(0.5f); // Wait for movement to start
+        }
+        
+        // Face nearby people
         FaceGroup();
         
         // --- SMART WAYPOINT LOGIC ---
@@ -250,7 +500,6 @@ public class NPC : MonoBehaviour
             }
             else if (_currentSmartWaypoint.areaType == Waypoint.AreaType.Bar)
             {
-                // TODO: Drinking animation trigger? For now just wait longer.
                 waitModifier += 2.0f; 
                 shouldDance = false;
             }
@@ -283,32 +532,35 @@ public class NPC : MonoBehaviour
         MoveToNextWaypoint();
     }
     
-    // Find nearby NPCs and look at the center of the group
+    // Find the closest nearby NPC and look at them
     private void FaceGroup()
     {
         if (_hasDancingParam && _anim.GetBool("IsDancing")) return;
 
         Collider[] hits = Physics.OverlapSphere(transform.position, socialRadius);
-        Vector3 centerPoint = Vector3.zero;
-        int count = 0;
+        
+        // Find the closest NPC
+        NPC closestNPC = null;
+        float closestDistance = float.MaxValue;
 
         foreach (var hit in hits)
         {
-            if (hit.GetComponent<NPC>() != null && hit.gameObject != gameObject)
+            NPC otherNPC = hit.GetComponent<NPC>();
+            if (otherNPC != null && otherNPC != this)
             {
-                // Phase 3: Invasion of Space - We might look AT a specific person too intensely
-                centerPoint += hit.transform.position;
-                count++;
+                float dist = Vector3.Distance(transform.position, otherNPC.transform.position);
+                if (dist < closestDistance)
+                {
+                    closestDistance = dist;
+                    closestNPC = otherNPC;
+                }
             }
         }
 
-        if (count > 0)
+        // Look at the closest NPC
+        if (closestNPC != null)
         {
-            centerPoint /= count;
-            Vector3 direction = (centerPoint - transform.position).normalized;
-            
-            // Phase 3 Logic: If Social invasion, maybe we look slightly OFF center or too direct?
-            
+            Vector3 direction = (closestNPC.transform.position - transform.position).normalized;
             direction.y = 0;
             if (direction != Vector3.zero)
             {

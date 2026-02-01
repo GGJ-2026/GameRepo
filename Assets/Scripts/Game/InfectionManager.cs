@@ -22,8 +22,10 @@ public class InfectionManager : MonoBehaviour
     [SerializeField] private List<NPC> allNPCs = new List<NPC>();
     [SerializeField] private int currentPZPhase = 0;
     
-    // Global Waypoints
     [SerializeField] private List<Waypoint> globalWaypoints = new List<Waypoint>();
+    
+    // Waypoint reservation system - tracks which NPC is heading to which waypoint
+    private Dictionary<Waypoint, NPC> _waypointReservations = new Dictionary<Waypoint, NPC>();
 
     private float _timer;
 
@@ -35,20 +37,16 @@ public class InfectionManager : MonoBehaviour
 
     private void Start()
     {
-        // Auto-find waypoints if list is empty
         if (globalWaypoints.Count == 0)
         {
-            // Method 1: Find existing Waypoint scripts
             Waypoint[] FoundWaypoints = FindObjectsOfType<Waypoint>();
             globalWaypoints.AddRange(FoundWaypoints);
 
-            // Method 2: Fallback to Tags if none found
             if (globalWaypoints.Count == 0)
             {
                 GameObject[] taggedObjects = GameObject.FindGameObjectsWithTag("Waypoint");
                 foreach (var go in taggedObjects)
                 {
-                    // Check if script is missing, then add it
                     Waypoint wp = go.GetComponent<Waypoint>();
                     if (wp == null) wp = go.AddComponent<Waypoint>();
                     
@@ -62,7 +60,6 @@ public class InfectionManager : MonoBehaviour
             }
         }
 
-        // Auto-infect a random NPC if none assigned
         if (patientZero == null && allNPCs.Count > 0)
         {
             StartGame(allNPCs[Random.Range(0, allNPCs.Count)]);
@@ -117,15 +114,12 @@ public class InfectionManager : MonoBehaviour
     [ContextMenu("Force Advance Plague")]
     public void AdvancePlague()
     {
-        // 1. Advance Patient Zero
         currentPZPhase++;
-        if (currentPZPhase > 4) currentPZPhase = 4; // Cap at max phase
+        if (currentPZPhase > 4) currentPZPhase = 4;
 
-        // Map Phase Index (0-4) to Enum (1-5), because 0 is None
         patientZero.SetInfectionStage((NPC.InfectionStage)(currentPZPhase + 1));
         Debug.Log($"Patient Zero advanced to Phase {currentPZPhase}");
 
-        // 2. Infect a new victim (start them at Phase 1: Cough)
         NPC victim = GetRandomHealthyNPC();
         if (victim != null)
         {
@@ -136,7 +130,6 @@ public class InfectionManager : MonoBehaviour
 
     public NPC GetRandomHealthyNPC()
     {
-        // Find all NPCs who are NOT the patient zero and are NOT yet infected
         var healthy = allNPCs.Where(n => n != patientZero && n.currentStage == NPC.InfectionStage.None).ToList();
         
         if (healthy.Count == 0) return null;
@@ -144,28 +137,42 @@ public class InfectionManager : MonoBehaviour
         return healthy[Random.Range(0, healthy.Count)];
     }
 
-    /// <summary>
-    /// Returns true if the given NPC is the original Patient Zero.
-    /// </summary>
     public bool IsPatientZero(NPC npc)
     {
         return npc != null && npc == patientZero;
     }
 
 
-    public Waypoint GetCleanWaypoint()
+    public Waypoint GetCleanWaypoint(NPC requestingNPC = null)
     {
         if (globalWaypoints.Count == 0) return null;
+        
+        bool wantsToCrowd = requestingNPC != null && 
+                            requestingNPC.currentStage == NPC.InfectionStage.Social;
+        
+        if (wantsToCrowd)
+        {
+            var crowdedWaypoints = _waypointReservations.Keys.ToList();
+            if (crowdedWaypoints.Count > 0)
+            {
+                Waypoint target = crowdedWaypoints[Random.Range(0, crowdedWaypoints.Count)];
+                return target;
+            }
+        }
 
-        // Try 10 times to find a spot that isn't crowded
         for (int i = 0; i < 10; i++)
         {
             Waypoint candidate = globalWaypoints[Random.Range(0, globalWaypoints.Count)];
-            bool isOccupied = Physics.CheckSphere(candidate.transform.position, 1.0f, LayerMask.GetMask("Default", "NPC")); 
+            
+            if (_waypointReservations.TryGetValue(candidate, out NPC owner) && owner != requestingNPC)
+            {
+                continue;
+            }
             
             bool tooClose = false;
             foreach(var npc in allNPCs)
             {
+                if (npc == requestingNPC) continue;
                 if (Vector3.Distance(npc.transform.position, candidate.transform.position) < 1.5f)
                 {
                     tooClose = true;
@@ -176,7 +183,31 @@ public class InfectionManager : MonoBehaviour
             if (!tooClose) return candidate;
         }
 
-        // If crowded, return random
+        var unreserved = globalWaypoints.Where(w => !_waypointReservations.ContainsKey(w)).ToList();
+        if (unreserved.Count > 0)
+        {
+            return unreserved[Random.Range(0, unreserved.Count)];
+        }
+        
         return globalWaypoints[Random.Range(0, globalWaypoints.Count)];
     }
+    
+    public void ReserveWaypoint(Waypoint waypoint, NPC npc)
+    {
+        if (waypoint == null || npc == null) return;
+        _waypointReservations[waypoint] = npc;
+    }
+    
+    public void ReleaseWaypoint(NPC npc)
+    {
+        if (npc == null) return;
+        
+        var toRemove = _waypointReservations.Where(kvp => kvp.Value == npc).Select(kvp => kvp.Key).ToList();
+        foreach (var wp in toRemove)
+        {
+            _waypointReservations.Remove(wp);
+        }
+    }
+    
+    public int GetReservationCount() => _waypointReservations.Count;
 }
