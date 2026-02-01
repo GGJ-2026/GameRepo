@@ -568,7 +568,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -695,7 +695,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -822,7 +822,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -949,7 +949,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1504,7 +1504,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -2365,7 +2365,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   coughSound: {fileID: 0}
   currentStage: 0
-  showDebugStatus: 0
+  showDebugStatus: 1
 --- !u!95 &528412777
 Animator:
   serializedVersion: 7
@@ -3014,7 +3014,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -3208,7 +3208,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   coughSound: {fileID: 0}
   currentStage: 0
-  showDebugStatus: 0
+  showDebugStatus: 1
 --- !u!95 &683483364
 Animator:
   serializedVersion: 7
@@ -3609,7 +3609,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   coughSound: {fileID: 0}
   currentStage: 0
-  showDebugStatus: 0
+  showDebugStatus: 1
 --- !u!95 &709574433
 Animator:
   serializedVersion: 7
@@ -4256,7 +4256,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -4459,7 +4459,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -4586,7 +4586,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -4881,7 +4881,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   coughSound: {fileID: 0}
   currentStage: 0
-  showDebugStatus: 0
+  showDebugStatus: 1
 --- !u!95 &1121846015
 Animator:
   serializedVersion: 7
@@ -5093,7 +5093,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -5220,7 +5220,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -6530,7 +6530,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   coughSound: {fileID: 0}
   currentStage: 0
-  showDebugStatus: 0
+  showDebugStatus: 1
 --- !u!95 &1230091814
 Animator:
   serializedVersion: 7
@@ -7036,7 +7036,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -8025,7 +8025,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -8219,7 +8219,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   coughSound: {fileID: 0}
   currentStage: 0
-  showDebugStatus: 0
+  showDebugStatus: 1
 --- !u!95 &1618880944
 Animator:
   serializedVersion: 7
@@ -8764,7 +8764,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   coughSound: {fileID: 0}
   currentStage: 0
-  showDebugStatus: 0
+  showDebugStatus: 1
 --- !u!195 &1852794077
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -8976,7 +8976,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.9811321, g: 0.83275586, b: 0.6803133, a: 1}
-  m_Intensity: 1.4
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
