@@ -9,17 +9,18 @@ public class MainMenu : MonoBehaviour
 
     public void Start()
     {
-        mainMenu.SetActive(true);
-        settingsMenu.SetActive(false);
+        if (mainMenu != null) mainMenu.SetActive(true);
+        if (settingsMenu != null) settingsMenu.SetActive(false);
     }
     public void StartGame()
     {
         SceneManager.LoadSceneAsync(1);
-        settingsMenu.SetActive(false);
-        mainMenu.SetActive(true);
+        if (settingsMenu != null) settingsMenu.SetActive(false);
+        if (mainMenu != null) mainMenu.SetActive(true);
     }
 
-    public void OpenSettings()
+//     DISABLED FOR NOW
+/*     public void OpenSettings()
     {
         mainMenu.SetActive(false);
         settingsMenu.SetActive(true);
@@ -29,7 +30,7 @@ public class MainMenu : MonoBehaviour
     {
         settingsMenu.SetActive(false);
         mainMenu.SetActive(true);
-    }
+    } */
 
     public void QuitGame()
     {
