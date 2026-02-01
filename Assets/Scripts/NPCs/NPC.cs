@@ -66,6 +66,15 @@ public class NPC : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        // Clean up waypoint reservation when NPC is destroyed
+        if (InfectionManager.Instance != null)
+        {
+            InfectionManager.Instance.ReleaseWaypoint(this);
+        }
+    }
+
     void Update()
     {
         // Phase 4: Stare Logic (Check periodically or always if close)
@@ -146,22 +155,32 @@ public class NPC : MonoBehaviour
 
     private void MoveToNextWaypoint()
     {
-        // Priority 1: Local Waypoints
+        // Release any previous waypoint reservation
+        if (InfectionManager.Instance != null)
+        {
+            InfectionManager.Instance.ReleaseWaypoint(this);
+        }
+        
+        // Priority 1: Local Waypoints (no reservation needed for local)
         if (waypoints.Length > 0)
         {
             int randomIndex = Random.Range(0, waypoints.Length);
             _agent.SetDestination(waypoints[randomIndex].position);
+            _currentSmartWaypoint = null;
             return;
         }
 
-        // Priority 2: Global Waypoints
+        // Priority 2: Global Waypoints with reservation
         if (InfectionManager.Instance != null)
         {
-            Waypoint dest = InfectionManager.Instance.GetCleanWaypoint();
+            Waypoint dest = InfectionManager.Instance.GetCleanWaypoint(this);
             if (dest != null)
             {
                 _currentSmartWaypoint = dest;
                 _agent.SetDestination(dest.transform.position);
+                
+                // Reserve this waypoint so others don't target it
+                InfectionManager.Instance.ReserveWaypoint(dest, this);
             }
         }
     }
@@ -232,7 +251,11 @@ public class NPC : MonoBehaviour
     {
         _isWaiting = true;
         
-        // Socialize: Face nearby people
+        // Release waypoint reservation now that we've arrived
+        if (InfectionManager.Instance != null)
+        {
+            InfectionManager.Instance.ReleaseWaypoint(this);
+        }
         // Phase 3 (Social Invasion): Stand weirdly close or ignore distance
         FaceGroup();
         
