@@ -48,6 +48,12 @@ public class NPC : MonoBehaviour
     private bool _stareActive = false;
     private bool _isStaring = false;
     
+    // Proximity detection - track nearby NPC distances
+    private System.Collections.Generic.Dictionary<NPC, float> _lastKnownDistances = new System.Collections.Generic.Dictionary<NPC, float>();
+    private float _proximityCheckTimer = 0f;
+    private const float PROXIMITY_CHECK_INTERVAL = 0.5f;
+    private const float APPROACH_THRESHOLD = 1.5f; // How much closer before we notice
+    
     // Debug
     [SerializeField] private bool showDebugStatus = true;
     private TextMesh _debugTextMesh;
@@ -117,6 +123,17 @@ public class NPC : MonoBehaviour
             FacePlayer();
             return;
         }
+        
+        // Proximity detection - look at NPCs that approached us
+        if (!_isWaiting && !_isStaring)
+        {
+            _proximityCheckTimer += Time.deltaTime;
+            if (_proximityCheckTimer >= PROXIMITY_CHECK_INTERVAL)
+            {
+                _proximityCheckTimer = 0f;
+                CheckForApproachingNPCs();
+            }
+        }
 
         // 2. Movement Logic
         // Check if we've reached the destination (Only if on NavMesh)
@@ -151,6 +168,63 @@ public class NPC : MonoBehaviour
     {
         _isTalking = false;
         _agent.isStopped = false;
+    }
+    
+    private void CheckForApproachingNPCs()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, socialRadius);
+        NPC approachingNPC = null;
+        float biggestApproach = 0f;
+        
+        foreach (var hit in hits)
+        {
+            NPC other = hit.GetComponent<NPC>();
+            if (other != null && other != this)
+            {
+                float currentDist = Vector3.Distance(transform.position, other.transform.position);
+                
+                // Check if we have a previous distance for this NPC
+                if (_lastKnownDistances.TryGetValue(other, out float previousDist))
+                {
+                    float approachAmount = previousDist - currentDist;
+                    
+                    // If they got significantly closer, remember them
+                    if (approachAmount > APPROACH_THRESHOLD && approachAmount > biggestApproach)
+                    {
+                        biggestApproach = approachAmount;
+                        approachingNPC = other;
+                    }
+                }
+                
+                // Update the distance
+                _lastKnownDistances[other] = currentDist;
+            }
+        }
+        
+        // If someone approached us, look at them
+        if (approachingNPC != null && !_isWaiting)
+        {
+            Vector3 direction = (approachingNPC.transform.position - transform.position).normalized;
+            direction.y = 0;
+            if (direction != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(direction);
+            }
+        }
+        
+        // Clean up NPCs that are no longer nearby
+        var keysToRemove = new System.Collections.Generic.List<NPC>();
+        foreach (var kvp in _lastKnownDistances)
+        {
+            if (kvp.Key == null || Vector3.Distance(transform.position, kvp.Key.transform.position) > socialRadius * 2f)
+            {
+                keysToRemove.Add(kvp.Key);
+            }
+        }
+        foreach (var key in keysToRemove)
+        {
+            _lastKnownDistances.Remove(key);
+        }
     }
 
     private void FacePlayer()
