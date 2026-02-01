@@ -15,8 +15,6 @@ public class MainMenu : MonoBehaviour
     public void StartGame()
     {
         SceneManager.LoadSceneAsync(1);
-        settingsMenu.SetActive(false);
-        mainMenu.SetActive(true);
     }
 
     public void OpenSettings()
