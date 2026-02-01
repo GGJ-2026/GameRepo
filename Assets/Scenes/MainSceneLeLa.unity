@@ -1064,6 +1064,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 57cafc62a5a914942bc76b35008a16d1, type: 3}
   m_PrefabInstance: {fileID: 145460164}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &154136749
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 154136750}
+  - component: {fileID: 154136752}
+  - component: {fileID: 154136751}
+  m_Layer: 0
+  m_Name: Point Light (16)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &154136750
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154136749}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -57.13, y: 2.706, z: 22.861}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 591206412}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &154136751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154136749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
+--- !u!108 &154136752
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154136749}
+  m_Enabled: 1
+  serializedVersion: 12
+  m_Type: 2
+  m_Color: {r: 1, g: 0.72156864, b: 0.36078432, a: 1}
+  m_Intensity: 240.7
+  m_Range: 15
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!1001 &195103389
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2250,12 +2377,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cecf5676f2c44c1caec679832ccc0a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  characterName: WAITER
+  characterName: Lola
   facePortrait: {fileID: 21300000, guid: 837c54d6dfa2d394b93aa54ec949d47c, type: 3}
-  npcDialog1: I saw the lady in red...
-  playerResponse1: Tell me more...
-  npcDialog2: She was dancing like a maniac.
-  playerResponse2: I see.
+  npcDialog1: What can I serve you?
+  playerResponse1: No drinks tonight, but I do have a question about your colleague.
+    How long has Royce been your colleague?
+  npcDialog2: Royce? He's been here ever since I got hired. We've grown quite close
+    the past couple weeks. Friends and all.
+  playerResponse2: Only friends? Nothing else? I've seen you two being almost nose-to-nose.
+  npcDialog3: Oh pfff, no. He can be flirtatious sure... But, lovers?  I guess he
+    has been staring a lot at me this evening.
+  playerResponse3: Right.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -2272,7 +2404,7 @@ Animator:
   m_GameObject: {fileID: 528412774}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: aa01df5b8a8e3427bb7da338a39cb027, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2733,6 +2865,8 @@ Transform:
   - {fileID: 1524352888}
   - {fileID: 1629353880}
   - {fileID: 1681490732}
+  - {fileID: 1239200259}
+  - {fileID: 154136750}
   - {fileID: 663544235}
   - {fileID: 517650995}
   - {fileID: 1951958394}
@@ -2916,6 +3050,8 @@ MonoBehaviour:
   playerResponse1: Tell me more...
   npcDialog2: She was dancing like a maniac.
   playerResponse2: I see.
+  npcDialog3: And then she vanished.
+  playerResponse3: Wow.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -3503,12 +3639,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cecf5676f2c44c1caec679832ccc0a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  characterName: WAITER
+  characterName: Anna
   facePortrait: {fileID: 21300000, guid: 69ba6f4ad30e8154c9a9f2a384e40d5d, type: 3}
-  npcDialog1: I saw the lady in red...
-  playerResponse1: Tell me more...
-  npcDialog2: She was dancing like a maniac.
-  playerResponse2: I see.
+  npcDialog1: "\u0411\u043B\u044F! Who are you? Can't you see I'm vibing?"
+  playerResponse1: Police. Miss, are you okay? I heard you possibly had tremors?
+  npcDialog2: Ru-ude, I was just vibing with the music. Modern dancing is thing you
+    know.
+  playerResponse2: Have you seen irregularities this evening?
+  npcDialog3: Yikes. Well your police buddy (CA) over there has been loafing around.
+    Pretty sure he has the hots for Lola.
+  playerResponse3: I see...
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -3525,7 +3665,7 @@ Animator:
   m_GameObject: {fileID: 683483362}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: aa01df5b8a8e3427bb7da338a39cb027, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -3908,12 +4048,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cecf5676f2c44c1caec679832ccc0a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  characterName: WAITER
+  characterName: Evan
   facePortrait: {fileID: 21300000, guid: 73c5a7d0118684f4fa1612d65c41179f, type: 3}
-  npcDialog1: I saw the lady in red...
-  playerResponse1: Tell me more...
-  npcDialog2: She was dancing like a maniac.
-  playerResponse2: I see.
+  npcDialog1: Long time no see. What do you want?
+  playerResponse1: Relax, I'm not here for you tonight. Who's been leaning in close
+    this evening?
+  npcDialog2: Royce has been cozying it up with the other bartender. Pretty sure
+    the cop guy is jalouse. And I would say the two girls have been closing distance.
+  playerResponse2: That all?
+  npcDialog3: I came in late, but I'm pretty sure Royce always opens up the place.
+  playerResponse3: Hmm.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -3930,7 +4074,7 @@ Animator:
   m_GameObject: {fileID: 709574430}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: aa01df5b8a8e3427bb7da338a39cb027, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -6025,12 +6169,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cecf5676f2c44c1caec679832ccc0a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  characterName: WAITER
+  characterName: Luis
   facePortrait: {fileID: 21300000, guid: bb190c9efbeec864399774e849b841fc, type: 3}
-  npcDialog1: I saw the lady in red...
-  playerResponse1: Tell me more...
-  npcDialog2: She was dancing like a maniac.
-  playerResponse2: I see.
+  npcDialog1: I wouldn't go inside if I were you.
+  playerResponse1: Not having a good time in here?
+  npcDialog2: The russian girl on the dance floor spasmed. I was sure she'd OD and
+    I don't want to be here when that happens.
+  playerResponse2: Can't do. Here on official duty.
+  npcDialog3: And then she vanished.
+  playerResponse3: Wow.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -6047,7 +6194,7 @@ Animator:
   m_GameObject: {fileID: 1121846012}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: aa01df5b8a8e3427bb7da338a39cb027, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -7431,12 +7578,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cecf5676f2c44c1caec679832ccc0a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  characterName: WAITER
+  characterName: Mina
   facePortrait: {fileID: 21300000, guid: 79d892724c6e2124296166ab2dec325b, type: 3}
-  npcDialog1: I saw the lady in red...
-  playerResponse1: Tell me more...
-  npcDialog2: She was dancing like a maniac.
-  playerResponse2: I see.
+  npcDialog1: Are you an officer of some kind?
+  playerResponse1: Can I've a moment of your time? I'm worried about your friend.
+  npcDialog2: It was horrible sir. She suddenly lost all control over her body. She's
+    totally downplaying it.
+  playerResponse2: ' Did she have any symptoms coming in? Any idea where she''s been?'
+  npcDialog3: She was shivering like crazy. I asked her if she was cold. She coughed
+    too y'know. I saw her talk to the guy behind the bar before I entered.
+  playerResponse3: Thank you.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -7453,7 +7604,7 @@ Animator:
   m_GameObject: {fileID: 1230091812}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: aa01df5b8a8e3427bb7da338a39cb027, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -7642,6 +7793,133 @@ Transform:
   m_Children: []
   m_Father: {fileID: 591206412}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1239200258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1239200259}
+  - component: {fileID: 1239200261}
+  - component: {fileID: 1239200260}
+  m_Layer: 0
+  m_Name: Point Light (15)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1239200259
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239200258}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -52.691, y: 3.01, z: 28.45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 591206412}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1239200260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239200258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
+--- !u!108 &1239200261
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239200258}
+  m_Enabled: 1
+  serializedVersion: 12
+  m_Type: 2
+  m_Color: {r: 1, g: 0.72156864, b: 0.36078432, a: 1}
+  m_Intensity: 240.7
+  m_Range: 15
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!1001 &1245782194
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7916,6 +8194,8 @@ MonoBehaviour:
   playerResponse1: Tell me more...
   npcDialog2: She was dancing like a maniac.
   playerResponse2: I see.
+  npcDialog3: And then she vanished.
+  playerResponse3: Wow.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -10172,6 +10452,8 @@ MonoBehaviour:
   playerResponse1: Tell me more...
   npcDialog2: She was dancing like a maniac.
   playerResponse2: I see.
+  npcDialog3: And then she vanished.
+  playerResponse3: Wow.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -10570,12 +10852,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cecf5676f2c44c1caec679832ccc0a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
-  characterName: WAITER
+  characterName: Royce
   facePortrait: {fileID: 21300000, guid: 175edd54e8a2fb443917ddd54133d804, type: 3}
-  npcDialog1: I saw the lady in red...
-  playerResponse1: Tell me more...
-  npcDialog2: She was dancing like a maniac.
-  playerResponse2: I see.
+  npcDialog1: Detective. What can I do for you?
+  playerResponse1: 'Have you been feeling well? '
+  npcDialog2: It's the time of year where people have colds. Surely you have noticed
+    how many people are coughing?
+  playerResponse2: Uhu. What kind of connection do you share with russian girl?
+  npcDialog3: Uhu. What kind of connection do you share with russian girl?
+  playerResponse3: Anna? Just a friendly customer. Are you also on the drug case
+    like your friend? You'll probably want to talk to the Crook.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -10592,7 +10878,7 @@ Animator:
   m_GameObject: {fileID: 1618880942}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: aa01df5b8a8e3427bb7da338a39cb027, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -10660,6 +10946,7 @@ GameObject:
   - component: {fileID: 1626262750}
   - component: {fileID: 1626262749}
   - component: {fileID: 1626262751}
+  - component: {fileID: 1626262752}
   m_Layer: 0
   m_Name: _GameManager
   m_TagString: Untagged
@@ -10730,6 +11017,19 @@ MonoBehaviour:
   allNPCs: []
   currentPZPhase: 0
   globalWaypoints: []
+--- !u!114 &1626262752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1626262748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09f107ce3ffc07c4f8b827ac63750acd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseMenu
+  pauseMenu: {fileID: 104672619}
 --- !u!1 &1629353879
 GameObject:
   m_ObjectHideFlags: 0
@@ -11258,6 +11558,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 591206412}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1699664675
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -85.5603
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0052000387
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 36.797245
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
+      propertyPath: m_Name
+      value: bar_end (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dd59d4fdbd3dede40b9f28e6f841d7f1, type: 3}
 --- !u!224 &1717811473 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 497094614263839331, guid: 1101768609cf04f958cf5ada10190143, type: 3}
@@ -11664,11 +12021,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   characterName: John
   facePortrait: {fileID: 21300000, guid: 7b4d80ea1ac1f6d4db2f4ce053e7c25f, type: 3}
-  npcDialog1: I wouldn't go inside if I were you.
-  playerResponse1: Not having a good time in here?
-  npcDialog2: The P1 on the dance floor spasmed. I was sure she'd OD and I don't
-    want to be here when that happens.
-  playerResponse2: Can't do. Here on official duty.
+  npcDialog1: 'Detective? What are y- *coughs* Sorry I''m having quite the dry throat
+    this evening. '
+  playerResponse1: Officer. Have you seen any suspicious activity? Has anyone behaved
+    oddly?
+  npcDialog2: 'No, I haven''t seen anything suspicious yet. Sick how? '
+  playerResponse2: Odd behavior. Otherworldly. The type where you get the heebie
+    jeebies.
+  npcDialog3: ' I don''t know about otherworldly, sir. But one of the girls started
+    twitching a while back, she''s lucky to have such a good friend with her.'
+  playerResponse3: She is.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -11707,7 +12069,7 @@ Animator:
   m_GameObject: {fileID: 1852794074}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: aa01df5b8a8e3427bb7da338a39cb027, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -13404,3 +13766,4 @@ SceneRoots:
   - {fileID: 1230091811}
   - {fileID: 528412773}
   - {fileID: 1618880941}
+  - {fileID: 1699664675}
