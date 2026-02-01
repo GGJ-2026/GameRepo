@@ -9,6 +9,7 @@ public class FirstPersonController : MonoBehaviour
     public InputAction lookAction;
     public InputAction jumpAction;
     public InputAction interactAction;
+    public InputAction stabAction;
 
     [Header("Movement Parameters")]
     [SerializeField] private float _moveSpeed = 5.0f;
@@ -33,6 +34,7 @@ public class FirstPersonController : MonoBehaviour
         lookAction.Enable();
         jumpAction.Enable();
         interactAction.Enable();
+        stabAction.Enable();
     }
 
     private void OnDisable()
@@ -41,6 +43,7 @@ public class FirstPersonController : MonoBehaviour
         lookAction.Disable();
         jumpAction.Disable();
         interactAction.Disable();
+        stabAction.Disable();
     }
 
     void Start()
@@ -89,11 +92,21 @@ public class FirstPersonController : MonoBehaviour
 
     private void HandleInteraction()
     {
+        // Talk action (E key)
         if (interactAction.WasPerformedThisFrame())
         {
             if (_interactionController != null)
             {
                 _interactionController.Interact();
+            }
+        }
+
+        // Stab action (LMB / Attack)
+        if (stabAction.WasPerformedThisFrame())
+        {
+            if (_interactionController != null)
+            {
+                _interactionController.StabTarget();
             }
         }
     }

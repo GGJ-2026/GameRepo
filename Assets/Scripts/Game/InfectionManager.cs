@@ -144,6 +144,15 @@ public class InfectionManager : MonoBehaviour
         return healthy[Random.Range(0, healthy.Count)];
     }
 
+    /// <summary>
+    /// Returns true if the given NPC is the original Patient Zero.
+    /// </summary>
+    public bool IsPatientZero(NPC npc)
+    {
+        return npc != null && npc == patientZero;
+    }
+
+
     public Waypoint GetCleanWaypoint()
     {
         if (globalWaypoints.Count == 0) return null;
