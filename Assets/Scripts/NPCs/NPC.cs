@@ -94,20 +94,9 @@ public class NPC : MonoBehaviour
 
     void Update()
     {
-        // Phase 4: Stare Logic (Check periodically or always if close)
-        if (currentStage == InfectionStage.Stare && !_isTalking && Camera.main != null)
-        {
-            // If player is close, stare at them
-            float distToPlayer = Vector3.Distance(transform.position, Camera.main.transform.position);
-            if (distToPlayer < 8.0f)
-            {
-                 FacePlayer(); 
-            }
-        }
-
+        // Debug label billboard - always face camera
         if (_debugTextMesh != null && Camera.main != null)
         {
-            // Billboard effect: Always face camera
             _debugTextMesh.transform.rotation = Camera.main.transform.rotation;
         }
 
@@ -334,7 +323,16 @@ public class NPC : MonoBehaviour
     {
         while (_coughActive)
         {
-            yield return new WaitForSeconds(Random.Range(10f, 30f));
+            // Use configurable interval from InfectionManager
+            float minInterval = 5f;
+            float maxInterval = 15f;
+            if (InfectionManager.Instance != null)
+            {
+                minInterval = InfectionManager.Instance.coughIntervalMin;
+                maxInterval = InfectionManager.Instance.coughIntervalMax;
+            }
+            
+            yield return new WaitForSeconds(Random.Range(minInterval, maxInterval));
             if (!_isTalking && _coughActive)
             {
                 Debug.Log($"[COUGH] {characterName}: *Coughs*");
@@ -397,8 +395,8 @@ public class NPC : MonoBehaviour
     {
         while (_stareActive)
         {
-            // Wait random time before staring
-            yield return new WaitForSeconds(Random.Range(8f, 15f));
+            // Wait ~10 seconds before staring
+            yield return new WaitForSeconds(Random.Range(8f, 12f));
             
             if (!_isTalking && _stareActive && Camera.main != null)
             {

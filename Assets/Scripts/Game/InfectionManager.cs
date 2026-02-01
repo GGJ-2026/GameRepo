@@ -9,9 +9,13 @@ public class InfectionManager : MonoBehaviour
     public static InfectionManager Instance;
 
     [Header("Settings")]
-    [SerializeField] private List<float> phaseDurations = new List<float>() { 60f, 60f, 45f, 30f, 30f }; // Duration for Phase 0, 1, 2, 3, 4
+    [SerializeField] private List<float> phaseDurations = new List<float>() { 60f, 60f, 45f, 30f, 30f };
     [SerializeField] private float defaultPhaseDuration = 30f;
     [SerializeField] private float infectionCheckInterval = 1.0f;
+    
+    [Header("Cough Settings")]
+    public float coughIntervalMin = 5f;
+    public float coughIntervalMax = 15f;
     
     [Header("Debug")]
     public bool isProgressionPaused = false;
@@ -106,9 +110,9 @@ public class InfectionManager : MonoBehaviour
     public void StartGame(NPC initialPatientZero)
     {
         patientZero = initialPatientZero;
-        currentPZPhase = 0;
-        patientZero.SetInfectionStage(NPC.InfectionStage.Carrier);
-        Debug.Log($"Infection Started. Patient Zero is: {patientZero.name}");
+        currentPZPhase = 1; // PZ starts at phase 1 (Cough)
+        patientZero.SetInfectionStage(NPC.InfectionStage.Cough);
+        Debug.Log($"Infection Started. Patient Zero is: {patientZero.name} (Phase 1 - Cough)");
     }
 
     [ContextMenu("Force Advance Plague")]
@@ -123,8 +127,8 @@ public class InfectionManager : MonoBehaviour
         NPC victim = GetRandomHealthyNPC();
         if (victim != null)
         {
-            victim.SetInfectionStage(NPC.InfectionStage.Cough);
-            Debug.Log($"New Infection Spreading to: {victim.name}");
+            victim.SetInfectionStage(NPC.InfectionStage.Carrier); // New infections start at Carrier
+            Debug.Log($"New Infection Spreading to: {victim.name} (Carrier)");
         }
     }
 
