@@ -2258,6 +2258,8 @@ MonoBehaviour:
   playerResponse1: Oke nice
   npcDialog2: Hoi!
   playerResponse2: doei
+  npcDialog3: And then she vanished.
+  playerResponse3: Wow.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -2356,7 +2358,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 8fd5252faf5e341218af454839d1312d, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 06b90074d955a46b9bd2f0765060cc79, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &663285276
 Transform:
@@ -5246,6 +5248,8 @@ MonoBehaviour:
   playerResponse1: Tell me more...
   npcDialog2: She was dancing like a maniac.
   playerResponse2: I see.
+  npcDialog3: And then she vanished.
+  playerResponse3: Wow.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -5780,6 +5784,8 @@ MonoBehaviour:
   playerResponse1: Tell me more...
   npcDialog2: She was dancing like a maniac.
   playerResponse2: I see.
+  npcDialog3: And then she vanished.
+  playerResponse3: Wow.
   waypoints: []
   waitTime: 3
   danceChance: 0.3
@@ -6102,6 +6108,8 @@ MonoBehaviour:
   playerResponse1: Tell me more...
   npcDialog2: She was dancing like a maniac.
   playerResponse2: I see.
+  npcDialog3: And then she vanished.
+  playerResponse3: Wow.
   waypoints: []
   waitTime: 3
   danceChance: 0.3

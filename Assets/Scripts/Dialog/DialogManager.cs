@@ -29,11 +29,15 @@ public class DialogManager : MonoBehaviour
     private Coroutine typingCoroutine;
     
     // Multi-stage data
-    private string _followUpText = "";
-    private string _confirmLabel1 = "";
-    private string _confirmLabel2 = "";
-    private bool _hasFollowUp = false;
-    private bool _inFollowUpPhase = false;
+    private string _stage0Text = ""; // Intro
+    private string _stage1Text = ""; // FollowUp
+    private string _stage2Text = ""; // Third
+    
+    private string _label0 = "";
+    private string _label1 = "";
+    private string _label2 = "";
+    
+    private int _currentStage = 0; // 0, 1, 2
 
     private Queue<string> _pages = new Queue<string>();
 
@@ -49,16 +53,20 @@ public class DialogManager : MonoBehaviour
         if (nevermindButton != null) nevermindButton.onClick.AddListener(() => OnOptionSelected(false));
     }
 
-public void StartDialog(string characterName, string introText, string followUpText, string confirmLabel1, string confirmLabel2, Sprite portrait = null)
+public void StartDialog(string characterName, string text0, string text1, string text2, string label0, string label1, string label2, Sprite portrait = null)
 {
     _pages.Clear();
     
     // reset state
-    _inFollowUpPhase = false;
-    _followUpText = followUpText;
-    _confirmLabel1 = confirmLabel1;
-    _confirmLabel2 = confirmLabel2;
-    _hasFollowUp = !string.IsNullOrEmpty(followUpText);
+    _currentStage = 0;
+    
+    _stage0Text = text0;
+    _stage1Text = text1;
+    _stage2Text = text2;
+    
+    _label0 = label0;
+    _label1 = label1;
+    _label2 = label2;
 
     if (nameText != null) 
     {
@@ -78,7 +86,7 @@ public void StartDialog(string characterName, string introText, string followUpT
         }
     }
 
-    var slicedPages = SliceText(introText, maxWordsPerPage);
+    var slicedPages = SliceText(_stage0Text, maxWordsPerPage);
     foreach (string page in slicedPages)
     {
         _pages.Enqueue(page);
@@ -140,7 +148,7 @@ public void StartDialog(string characterName, string introText, string followUpT
         }
         else
         {
-            // Show choices after Intro AND after FollowUp (per user request)
+            // Show choices after current stage text is done
             ShowChoices();
         }
     }
@@ -159,9 +167,10 @@ public void StartDialog(string characterName, string introText, string followUpT
             // Update button texts based on phase
             if (tellMeMoreButton != null)
             {
-               string label = !_inFollowUpPhase 
-                   ? (string.IsNullOrEmpty(_confirmLabel1) ? "Tell me more..." : _confirmLabel1)
-                   : (string.IsNullOrEmpty(_confirmLabel2) ? "I see." : _confirmLabel2);
+               string label = _label0; // Default
+               if (_currentStage == 0) label = string.IsNullOrEmpty(_label0) ? "Next..." : _label0;
+               else if (_currentStage == 1) label = string.IsNullOrEmpty(_label1) ? "Next..." : _label1;
+               else if (_currentStage == 2) label = string.IsNullOrEmpty(_label2) ? "Next..." : _label2;
 
                // Try to use Hover Effect script if it exists, otherwise fallback
                var hover = tellMeMoreButton.GetComponent<UIButtonHover>();
@@ -191,21 +200,37 @@ public void StartDialog(string characterName, string introText, string followUpT
         Cursor.lockState = CursorLockMode.Locked; 
         Cursor.visible = false;
 
-        if (wantsMore && _hasFollowUp && !_inFollowUpPhase)
+        if (wantsMore)
         {
-            // Start Part 2
-            _inFollowUpPhase = true;
-            _pages.Clear();
-            var slicedPages = SliceText(_followUpText, maxWordsPerPage);
-            foreach (string page in slicedPages) _pages.Enqueue(page);
-            
-            AdvanceDialog();
+            // Check if there is a next stage
+            bool hasNext = false;
+            string nextText = "";
+
+            if (_currentStage == 0 && !string.IsNullOrEmpty(_stage1Text))
+            {
+                _currentStage = 1;
+                nextText = _stage1Text;
+                hasNext = true;
+            }
+            else if (_currentStage == 1 && !string.IsNullOrEmpty(_stage2Text))
+            {
+                _currentStage = 2;
+                nextText = _stage2Text;
+                hasNext = true;
+            }
+
+            if (hasNext)
+            {
+                _pages.Clear();
+                var slicedPages = SliceText(nextText, maxWordsPerPage);
+                foreach (string page in slicedPages) _pages.Enqueue(page);
+                AdvanceDialog();
+                return;
+            }
         }
-        else
-        {
-            // End conversation (Nevermind OR we just finished the follow up)
-            EndDialog();
-        }
+
+        // End conversation (Nevermind OR no more stages)
+        EndDialog();
     }
 
     private IEnumerator TypewriterEffect(string message)
